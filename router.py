@@ -1,6 +1,9 @@
 ﻿from webhandler import basehandler
 import tornado.web
 
+from webhandler.test import TestHandler
+
+
 class MainHandler(basehandler.BaseHandler):
     def get(self):
         # print(self.request.body, self.request.query)
@@ -14,7 +17,7 @@ class MainHandler(basehandler.BaseHandler):
 def make_app():
     return tornado.web.Application([
         (r"/", MainHandler),
-        # (r"/user/login", LoginHandler),                          # 登录
+        (r"/test", TestHandler),                          # 登录
         ],
         # cookie_secret = 'cb56YAgMjpevlWBNqgrv5g==',
         # login_url = '/',

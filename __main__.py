@@ -3,7 +3,7 @@ import tornado.options
 from peewee_async import Manager
 
 import router
-from config import DATABASE
+# from config import DATABASE
 
 if __name__ == "__main__":
     tornado.options.define("port", default=6868, help="run on the given port", type=int)
@@ -21,8 +21,8 @@ if __name__ == "__main__":
     app.settings.update(autoreload=True)
     app.settings.update(serve_traceback=False)
     app.listen(tornado.options.options.port)
-    objects = Manager(DATABASE)
+    # objects = Manager(DATABASE)
     # No need for sync anymore!
-    DATABASE.set_allow_sync(False)
-    app.objects = objects
+    # DATABASE.set_allow_sync(False)
+    # app.objects = objects
     tornadoloop.start()

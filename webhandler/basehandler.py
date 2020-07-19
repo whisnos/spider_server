@@ -11,6 +11,8 @@ from config import SENSTIVE_WORD, API_SECURITY_CHECK_OPEN, API_SECURITY_SECONDS,
 log = applog.get_log('webhandler.basehandler')
 log.setLevel('INFO')
 redisdb = RedisOperate().instance()
+from motor.motor_asyncio import AsyncIOMotorClient
+connection = AsyncIOMotorClient("127.0.0.1", 27017)
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -233,6 +235,10 @@ class BaseHandler(tornado.web.RequestHandler):
             urllib.parse.unquote(self.request.body.decode('utf-8'), errors='replace')))
         return
 
+    @property
+    def db(self):
+        self.application.db = connection['spider']
+        return self.application.db
 
 def check_login(func):
     """
