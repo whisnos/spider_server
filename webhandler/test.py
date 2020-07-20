@@ -28,13 +28,14 @@ async def run():
 class TestHandler(BaseHandler):
     async def get(self):
         result = []
+        print(55)
         data = {
             'id': 1,
             'content': '测试'
         }
         # self.db.search_words_dtk.update_one({'id': 1}, {'$set': {'content': '酸辣辣'}})
 
-        print(55)
+
 
         async for doc in self.db.search_words_dtk.find().limit(2):
             doc.pop('date', '404')
@@ -48,13 +49,3 @@ class TestHandler(BaseHandler):
 
 if __name__ == '__main__':
     pass
-    # async def test_user_sendsms():
-    #     obj = UserHandler()
-    #     await RedisOperate().instance().create_redis_pool()
-    #     await DbOperate().instance().create_db_pool()
-    #     code, result = await obj.send_sms('1','13950126971')
-    #     print(code, result)
-
-    # import asyncio
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(test_user_sendsms())

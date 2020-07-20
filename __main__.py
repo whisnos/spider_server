@@ -6,7 +6,7 @@ import router
 # from config import DATABASE
 
 if __name__ == "__main__":
-    tornado.options.define("port", default=6868, help="run on the given port", type=int)
+    tornado.options.define("port", default=7878, help="run on the given port", type=int)
     tornado.options.parse_command_line()
     # threading.Thread(target=lambda:torloop.spawn_callback(userobjall.api_callback), name='thread_api_callback').start()
     # workers = gen.multi([userobjall.get_api_result() for b in range(30)])

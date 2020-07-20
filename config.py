@@ -55,7 +55,7 @@ PAGE_SIZE = 10
 
 # 本地日志绝对路径
 # LOGPATH = '/home/server/'
-LOGPATH = 'D:/spider/'
+LOGPATH = 'e:/dev/spider_server/'
 
 # 阿里云短信配置:
 ALIYUN_SMS_ID = ""
