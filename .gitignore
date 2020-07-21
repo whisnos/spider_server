@@ -8,3 +8,5 @@ __pycache__/
 .idea/
 __pycache__/
 *.out
+config.py
+__main__.py
