@@ -1,7 +1,7 @@
 ﻿from webhandler import basehandler
 import tornado.web
 
-from webhandler.count import CountProductSellHandler
+from webhandler.count import CountProductSellHandler, CountUserProductSellHandler
 from webhandler.item import ItemCommentDetailHandler, ItemCommentTagListDetailHandler
 from webhandler.test import TestHandler
 
@@ -22,6 +22,7 @@ def make_app():
         (r"/item/commenttaglist", ItemCommentTagListDetailHandler),                  # 获取商品评论标签
         (r"/item/commentdetail", ItemCommentDetailHandler),                          # 获取商品评论详情
         (r"/count/productsellcount", CountProductSellHandler),                       # 计算商品销量
+        (r"/count/usersellcount", CountUserProductSellHandler),                       # 根据商家id计算商品销量
         ],
         # cookie_secret = 'cb56YAgMjpevlWBNqgrv5g==',
         # login_url = '/',
