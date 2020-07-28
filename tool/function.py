@@ -57,7 +57,7 @@ def Return_headers():
 
 def return_sqlserver_connect():
     try:
-        conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1',
+        conn = pymssql.connect(host='172.17.146.39', port='1433', user='sa', password='shanpengfei@no1',
                                database='TaoKe')
         cur = conn.cursor()
     except Exception as e:
