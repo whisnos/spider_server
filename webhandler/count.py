@@ -1,4 +1,5 @@
 import datetime
+import threading
 
 from tool.function import return_sqlserver_connect
 from webhandler.basehandler import BaseHandler
@@ -6,38 +7,75 @@ import pymssql
 
 # conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1', database='TaoKe')
 # cur = conn.cursor()
-
+from pymongo import MongoClient
+client = MongoClient('127.0.0.1', 27017)
+db = client.spider
 class CountProductSellHandler(BaseHandler):
-    async def post(self, *args, **kwargs):
 
+    def return_data(self,collection,item,now_prv,now):
+        data_dict = {}
+        print('item',item,now_prv)
+        the_data = []
+        for doc in collection.find({"itemid": str(item), "createTime": {"$gte": now_prv, "$lte": now}}):
+                # doc.pop('_id', '404')
+                # doc.pop('createTime', '404')
+
+                print('doc',doc)
+                the_data.append(doc)
+        if the_data:
+            the_num = int(the_data[-1]['volume'])-int(the_data[0]['volume'])
+            volume = the_num if the_num >= 0 else 0
+            data_dict['itemid']=item
+            data_dict['volume'] = volume
+            self.result.append(data_dict)
+        else:
+            data_dict['itemid'] = item
+            data_dict['volume'] = 0
+            self.result.append(data_dict)
+
+
+    async def post(self, *args, **kwargs):
+        self.result = []
         items = self.verify_arg_legal(self.get_body_argument('items'), '商品id')
         now = datetime.datetime.now()
         # now_prv = datetime.datetime.now() - datetime.timedelta(hours=2)
-        now_prv = now - datetime.timedelta(hours=now.hour, minutes=now.minute, seconds=now.second,microseconds=now.microsecond)
+        now_prv = now -datetime.timedelta(hours=24*7)-datetime.timedelta(hours=now.hour, minutes=now.minute, seconds=now.second,microseconds=now.microsecond)
         # day = now.day
-        day = str(now.date()).replace('-', '_')
+        day = str(now_prv.date()).replace('-', '_')
         item_list = items.split(',')
-        collection = eval('self.db.products_{}'.format(day))
+        # collection = eval('self.db.products_{}'.format(day))
+        print('day',day)
+        collection =eval('db.products_{}'.format(day))
         # collection = eval('self.db.product_{}'.format(21))
         result = []
-        for item in item_list:
-            data_dict = {}
-            the_data=[]
-            async for doc in collection.find({"itemid": str(item), "createTime": {"$gte": now_prv, "$lte": now}}):
-                # doc.pop('_id', '404')
-                # doc.pop('createTime', '404')
-                the_data.append(doc)
-            if the_data:
-                the_num = int(the_data[-1]['volume'])-int(the_data[0]['volume'])
-                volume = the_num if the_num >= 0 else 0
-                data_dict['itemid']=item
-                data_dict['volume'] = volume
-                result.append(data_dict)
-            else:
-                data_dict['itemid'] = item
-                data_dict['volume'] = 0
-                result.append(data_dict)
-        return self.send_message(True, 0, 'success', result)
+        # for item in item_list:
+        #     data_dict = {}
+        #     the_data=[]
+        #     async for doc in collection.find({"itemid": str(item), "createTime": {"$gte": now_prv, "$lte": now}}):
+        #         # doc.pop('_id', '404')
+        #         # doc.pop('createTime', '404')
+        #         the_data.append(doc)
+        #     if the_data:
+        #         the_num = int(the_data[-1]['volume'])-int(the_data[0]['volume'])
+        #         volume = the_num if the_num >= 0 else 0
+        #         data_dict['itemid']=item
+        #         data_dict['volume'] = volume
+        #         result.append(data_dict)
+        #     else:
+        #         data_dict['itemid'] = item
+        #         data_dict['volume'] = 0
+        #         result.append(data_dict)
+        size = 20
+        for b in [item_list[i:i + size] for i in range(0, len(item_list), size)]:
+            threads = []
+            for u in b:
+                t = threading.Thread(target=self.return_data, args=(collection,u,now_prv,now))
+                t.start()
+                threads.append(t)
+            for t in threads:
+                t.join()
+        print('主进程结束')
+        return self.send_message(True, 0, 'success', self.result)
 
 
 class CountUserProductSellHandler(BaseHandler):
@@ -48,7 +86,7 @@ class CountUserProductSellHandler(BaseHandler):
         search_item_sql = "select TmID,Name from Product where User_ID='{}'".format(user_id)
         print('search_item_sql', search_item_sql,the_type)
         if not cur:
-            return self.send_message(False, 400, '连接失败', None)
+            return self.send_message(True, 0, '没有数据', None)
         try:
             cur.execute(search_item_sql)
             the_results = cur.fetchall()

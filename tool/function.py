@@ -56,6 +56,7 @@ def Return_headers():
 
 
 def return_sqlserver_connect():
+    # 172.17.146.39 192.168.32.24
     try:
         conn = pymssql.connect(host='172.17.146.39', port='1433', user='sa', password='shanpengfei@no1',
                                database='TaoKe')
