@@ -1,10 +1,11 @@
 import datetime
 
+from tool.function import return_sqlserver_connect
 from webhandler.basehandler import BaseHandler
 import pymssql
 
-conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1', database='TaoKe')
-cur = conn.cursor()
+# conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1', database='TaoKe')
+# cur = conn.cursor()
 
 class CountProductSellHandler(BaseHandler):
     async def post(self, *args, **kwargs):
@@ -43,8 +44,11 @@ class CountUserProductSellHandler(BaseHandler):
     async def post(self, *args, **kwargs):
         user_id = self.verify_arg_legal(self.get_body_argument('userid'), '商家id')
         the_type = self.verify_arg_num(self.get_body_argument('type'), '类型',is_num=True)
+        cur, conn = return_sqlserver_connect()
         search_item_sql = "select TmID,Name from Product where User_ID='{}'".format(user_id)
         print('search_item_sql', search_item_sql,the_type)
+        if not cur:
+            return self.send_message(False, 400, '连接失败', None)
         try:
             cur.execute(search_item_sql)
             the_results = cur.fetchall()

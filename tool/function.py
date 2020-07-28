@@ -1,4 +1,5 @@
 import hashlib
+import pymssql
 import random
 import uuid
 
@@ -52,6 +53,16 @@ def Return_headers():
         "sec-fetch-mode": "no-cors",
         "sec-fetch-site": "same-site", }
     return headers
+
+
+def return_sqlserver_connect():
+    try:
+        conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1',
+                               database='TaoKe')
+        cur = conn.cursor()
+    except Exception as e:
+        return False, False
+    return cur, conn
 
 
 if __name__ == '__main__':
