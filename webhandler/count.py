@@ -108,7 +108,7 @@ class CountUserProductSellHandler(BaseHandler):
             data_dict['volume'] = 0
             for item in the_results:
                 the_data = []
-                this_day_collection = eval('self.db.products_{}'.format(this_day))
+                this_day_collection = eval('db.products_{}'.format(this_day))
                 async for doc in this_day_collection.find({"itemid": str(item[0])}):
                     the_data.append(doc)
                 if the_data:
