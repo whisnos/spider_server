@@ -40,10 +40,10 @@ class CountProductSellHandler(BaseHandler):
         self.result = []
         items = self.verify_arg_legal(self.get_body_argument('items'), '商品id')
         now = datetime.datetime.now()
-        # now_prv = datetime.datetime.now() - datetime.timedelta(hours=2)
-        now_prv = now - datetime.timedelta(hours=24 * 7) - datetime.timedelta(hours=now.hour, minutes=now.minute,
-                                                                              seconds=now.second,
-                                                                              microseconds=now.microsecond)
+        now_prv = datetime.datetime.now() - datetime.timedelta(hours=2)
+        # now_prv = now - datetime.timedelta(hours=24 * 7) - datetime.timedelta(hours=now.hour, minutes=now.minute,
+        #                                                                       seconds=now.second,
+        #                                                                       microseconds=now.microsecond)
         # day = now.day
         day = str(now_prv.date()).replace('-', '_')
         item_list = items.split(',')
