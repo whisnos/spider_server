@@ -99,6 +99,7 @@ class CountUserProductSellHandler(BaseHandler):
             return self.send_message(True, 0, '没有数据', None)
         # 处理时间
         all_day = []
+        print(666,len(the_results))
         for i in range(the_type):
             data_dict = {}
             the_day = (datetime.datetime.now() - datetime.timedelta(hours=i * 24)).date()
@@ -106,6 +107,7 @@ class CountUserProductSellHandler(BaseHandler):
             # data_dict 每天的数据统计
             data_dict['day'] = str(the_day)
             data_dict['volume'] = 0
+            print(888)
             for item in the_results:
                 the_data = []
                 this_day_collection = eval('db.products_{}'.format(this_day))
