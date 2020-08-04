@@ -107,11 +107,11 @@ class CountUserProductSellHandler(BaseHandler):
             # data_dict 每天的数据统计
             data_dict['day'] = str(the_day)
             data_dict['volume'] = 0
-            print(888)
+            print(888,the_results[0])
             for item in the_results:
                 the_data = []
                 this_day_collection = eval('db.products_{}'.format(this_day))
-                async for doc in this_day_collection.find({"itemid": str(item[0])}):
+                async for doc in this_day_collection.find({"itemid": str(item["TmID"])}):
                     the_data.append(doc)
                 if the_data:
                     the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
