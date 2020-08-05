@@ -3,6 +3,8 @@ import pymssql
 import random
 import uuid
 
+from config import SQL_SERVER
+
 
 def MD5encrypt(text):
     ''' md5加密 '''
@@ -58,8 +60,8 @@ def Return_headers():
 def return_sqlserver_connect():
     # 172.17.146.39 192.168.32.24
     try:
-        conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1',
-                               database='TaoKe')
+        conn = pymssql.connect(host=SQL_SERVER['host'], port=SQL_SERVER['port'], user=SQL_SERVER['user'], password=SQL_SERVER['pwd'],
+                               database=SQL_SERVER['db'])
         cur = conn.cursor(as_dict=True)
     except Exception as e:
         return False, False

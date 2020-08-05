@@ -4,6 +4,7 @@ import threading
 
 from asgiref.sync import sync_to_async
 
+from config import MONGODB
 from tool.function import return_sqlserver_connect
 from webhandler.basehandler import BaseHandler
 import pymssql
@@ -15,7 +16,8 @@ from pymongo import MongoClient
 # client = MongoClient('127.0.0.1', 27017)
 from motor.motor_asyncio import AsyncIOMotorClient
 
-client = AsyncIOMotorClient('mongodb://testmongo:testmongo123@39.105.179.250:27017/spider')
+# client = AsyncIOMotorClient('mongodb://testmongo:testmongo123@39.105.179.250:27017/spider')
+client = AsyncIOMotorClient('mongodb://{}:{}@{}:{}/{}'.format(MONGODB['user'],MONGODB['pwd'],MONGODB['host'],MONGODB['port'],MONGODB['db'],))
 # client = MongoClient('39.105.179.250', 27017)
 db = client.spider
 
