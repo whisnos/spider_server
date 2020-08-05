@@ -21,9 +21,9 @@ def make_app():
         (r"/test", TestHandler),                                                     # 测试api
         (r"/item/commenttaglist", ItemCommentTagListDetailHandler),                  # 获取商品评论标签
         (r"/item/commentdetail", ItemCommentDetailHandler),                          # 获取商品评论详情
-        (r"/count/productsellcount", CountProductSellHandler),                       # 计算商品销量
-        (r"/count/usersellcount", CountUserProductSellHandler),                       # 根据商家id计算商品销量
-        (r"/count/topsell", CountProductTopSellHandler),                                 # 根据销量计算榜单
+        (r"/count/productsellcount", CountProductSellHandler),                       # 计算20个销量
+        (r"/count/usersellcount", CountUserProductSellHandler),                      # 根据商家id计算商品销量
+        (r"/count/topsell", CountProductTopSellHandler),                             # 根据销量计算榜单100
         ],
         # cookie_secret = 'cb56YAgMjpevlWBNqgrv5g==',
         # login_url = '/',
