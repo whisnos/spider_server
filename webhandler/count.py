@@ -109,13 +109,13 @@ class CountUserProductSellHandler(BaseHandler):
         search_item_sql = "select TmID,Name from Product where User_ID='{}'".format(user_id)
         print('search_item_sql', search_item_sql, the_type)
         if not cur:
-            return self.send_message(False, 400, '没有数据', None)
+            return self.send_message(False, 400, '连接失败', None)
         try:
             cur.execute(search_item_sql)
             the_results = cur.fetchall()
             conn.commit()
         except Exception as e:
-            return self.send_message(False, 400, '没有数据', None)
+            return self.send_message(False, 400, '获取失败', None)
         # 处理时间
         all_day = []
         print(666, len(the_results))
