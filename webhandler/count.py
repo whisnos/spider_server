@@ -252,7 +252,7 @@ class CountProductHourTopSellHandler(BaseHandler):
             the_sub = []
             for a, b in v.items():
                 the_sub.append(b)
-            data = int(the_sub[0]) - int(the_sub[1])
+            data = int(the_sub[0]) - int(the_sub[-1])
             return_data = {}
             return_data['itemid'] = k
             return_data['volume'] = data
