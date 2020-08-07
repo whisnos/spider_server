@@ -158,6 +158,7 @@ class CountUserProductSellHandler(BaseHandler):
 
 class CountProductTopSellHandler(BaseHandler):
     async def post(self, *args, **kwargs):
+        cate_id = self.verify_arg_legal(self.get_body_argument('cate_id', ''), '类目id')
         now = datetime.datetime.now()
         day = now.date()
         day_format = str(day).replace('-', '_')
@@ -168,11 +169,22 @@ class CountProductTopSellHandler(BaseHandler):
         collection = eval('db.products_{}'.format(day_format))
 
         # collection.aggregate([{"$group": {"itemid": "$itemid", "num": {"$sum": "$likes"}}}])
+        max_list = []
+        min_list = []
+        if not cate_id:
+            # cate_dict = {"$match":{"cateid": "$cateid"}}
+            pass
+        else:
+            cate_dict = {"$match": {"cateid": cate_id}}
+            max_list.insert(0, cate_dict)
+            min_list.insert(0, cate_dict)
 
         max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
+        max_list.append(max_dict)
         min_dict = {"$group": {"_id": "$itemid", "volume": {"$first": "$volume"}}}
-        cursor_max = await sync_to_async(collection.aggregate)([max_dict])
-        cursor_min = await sync_to_async(collection.aggregate)([min_dict])
+        min_list.append(min_dict)
+        cursor_max = await sync_to_async(collection.aggregate)(max_list)
+        cursor_min = await sync_to_async(collection.aggregate)(min_list)
         # async for a in cursor_max:
         #     print(1111111,a)
         # the_dict = {"$group": {"_id":"$itemid","volume":{"$sum":{ "$multiply": [ "$price", "$quantity" ] }}}}
@@ -208,6 +220,7 @@ class CountProductTopSellHandler(BaseHandler):
 
 class CountProductHourTopSellHandler(BaseHandler):
     async def post(self, *args, **kwargs):
+        cate_id = self.verify_arg_legal(self.get_body_argument('cate_id',''), '类目id')
         now = datetime.datetime.now()
         day = now.date()
         day_format = str(day).replace('-', '_')
@@ -220,14 +233,29 @@ class CountProductHourTopSellHandler(BaseHandler):
         collection = eval('db.products_{}'.format(day_format))
 
         # collection.aggregate([{"$group": {"itemid": "$itemid", "num": {"$sum": "$likes"}}}])
+        max_list = []
+        min_list = []
+        if not cate_id:
+            # cate_dict = {"$match":{"cateid": "$cateid"}}
+            pass
+        else:
+            cate_dict = {"$match": {"cateid": cate_id}}
+            max_list.insert(0,cate_dict)
+            min_list.insert(0,cate_dict)
 
-        max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
-        min_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
         sec_dict = {"$match": {"createTime": {"$lte": two_hour}}}
+        min_list.append(sec_dict)
+        max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
+        max_list.append(max_dict)
+
+        min_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
+        min_list.append(min_dict)
         # sec_dict = {"$skip" : 3}
-        cursor_max = await sync_to_async(collection.aggregate)([max_dict])
-        cursor_min = await sync_to_async(collection.aggregate)([sec_dict, min_dict, ])
-        print(12)
+
+        # print('max_list',max_list)
+        # print('min_list',min_list)
+        cursor_max = await sync_to_async(collection.aggregate)(max_list)
+        cursor_min = await sync_to_async(collection.aggregate)(min_list)
         # async for a in cursor_max:
         #     print(1111111,a)
         # the_dict = {"$group": {"_id":"$itemid","volume":{"$sum":{ "$multiply": [ "$price", "$quantity" ] }}}}
@@ -238,13 +266,13 @@ class CountProductHourTopSellHandler(BaseHandler):
             the_dict = {}
             the_dict['max'] = i['volume']
             data_dict[i['_id']] = the_dict
-            # print(i)
+            # print('max',i)
         # cursor_min = collection.aggregate([min_dict])
         async for i in cursor_min:
             # the_dict = {}
             # the_dict['min'] = i['volume']
             data_dict[i['_id']]['min'] = i['volume']
-            # print(i)
+            # print('min',i)
         # print('data_dict',data_dict)
         result = []
         for k, v in data_dict.items():
@@ -261,37 +289,37 @@ class CountProductHourTopSellHandler(BaseHandler):
         return self.send_message(True, 0, 'success', new_list)
 
 
-class CountProductCateTopSellHandler(BaseHandler):
-    async def post(self, *args, **kwargs):
-        cate_id = self.verify_arg_legal(self.get_body_argument('cate_id'), '类目id')
-        now = datetime.datetime.now()
-        day = now.date()
-        day_format = str(day).replace('-', '_')
-        collection = eval('db.products_{}'.format(day_format))
-        max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
-        min_dict = {"$group": {"_id": "$itemid", "volume": {"$first": "$volume"}}}
-        sec_dict = {"$match": {"cateid": cate_id}}
-        cursor_max = await sync_to_async(collection.aggregate)([sec_dict,max_dict])
-        cursor_min = await sync_to_async(collection.aggregate)([sec_dict, min_dict, ])
-        data_dict = {}
-        async for i in cursor_max:
-            the_dict = {}
-            the_dict['max'] = i['volume']
-            data_dict[i['_id']] = the_dict
-        async for i in cursor_min:
-            data_dict[i['_id']]['min'] = i['volume']
-        result = []
-        for k, v in data_dict.items():
-            the_sub = []
-            for a, b in v.items():
-                the_sub.append(b)
-            data = int(the_sub[0]) - int(the_sub[1])
-            return_data = {}
-            return_data['itemid'] = k
-            return_data['volume'] = data
-            result.append(return_data)
-        new_list = sorted(result, key=operator.itemgetter('volume'), reverse=True)[:100]
-        return self.send_message(True, 0, 'success', new_list)
+# class CountProductCateTopSellHandler(BaseHandler):
+#     async def post(self, *args, **kwargs):
+#         cate_id = self.verify_arg_legal(self.get_body_argument('cate_id'), '类目id')
+#         now = datetime.datetime.now()
+#         day = now.date()
+#         day_format = str(day).replace('-', '_')
+#         collection = eval('db.products_{}'.format(day_format))
+#         max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
+#         min_dict = {"$group": {"_id": "$itemid", "volume": {"$first": "$volume"}}}
+#         sec_dict = {"$match": {"cateid": cate_id}}
+#         cursor_max = await sync_to_async(collection.aggregate)([sec_dict,max_dict])
+#         cursor_min = await sync_to_async(collection.aggregate)([sec_dict, min_dict, ])
+#         data_dict = {}
+#         async for i in cursor_max:
+#             the_dict = {}
+#             the_dict['max'] = i['volume']
+#             data_dict[i['_id']] = the_dict
+#         async for i in cursor_min:
+#             data_dict[i['_id']]['min'] = i['volume']
+#         result = []
+#         for k, v in data_dict.items():
+#             the_sub = []
+#             for a, b in v.items():
+#                 the_sub.append(b)
+#             data = int(the_sub[0]) - int(the_sub[1])
+#             return_data = {}
+#             return_data['itemid'] = k
+#             return_data['volume'] = data
+#             result.append(return_data)
+#         new_list = sorted(result, key=operator.itemgetter('volume'), reverse=True)[:100]
+#         return self.send_message(True, 0, 'success', new_list)
 
 
 if __name__ == '__main__':
