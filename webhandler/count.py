@@ -98,62 +98,19 @@ class CountProductSellHandler(BaseHandler):
 
 class CountUserProductSellHandler(BaseHandler):
 
-    async def do_find_one(self, this_day, TmID):
-        this_day_collection = eval('db.products_{}'.format(this_day))
-        print(6)
-        async for document in this_day_collection.find({"itemid": str(TmID)}):
-            print(123, document)
-
     async def post(self, *args, **kwargs):
         user_id = self.verify_arg_legal(self.get_body_argument('userid'), '商家id')
-        the_type = self.verify_arg_num(self.get_body_argument('type'), '类型', is_num=True)
-        cur, conn = return_sqlserver_connect()
-        search_item_sql = "select TmID,Name from Product where User_ID='{}'".format(user_id)
-        print('search_item_sql', search_item_sql, the_type)
-        if not cur:
-            return self.send_message(False, 400, '连接失败', None)
+        the_type = self.verify_arg_num(self.get_body_argument('type','7'), '类型', is_num=True)
+        result = []
         try:
-            cur.execute(search_item_sql)
-            the_results = cur.fetchall()
-            conn.commit()
+            async for doc in db.users_sell.find({"ID": user_id.lower()}).sort([("_id", 1)]).limit(the_type):
+                doc.pop('_id', '404')
+                doc.pop('ID', '404')
+                doc.pop('createTime', '404')
+                result.append(doc)
         except Exception as e:
-            return self.send_message(False, 400, '获取失败', None)
-        # 处理时间
-        all_day = []
-        print(666, len(the_results))
-        for i in range(the_type):  # 1,the_type+1
-            data_dict = {}
-            the_day = (datetime.datetime.now() - datetime.timedelta(hours=i * 24)).date()
-            this_day = str((datetime.datetime.now() - datetime.timedelta(hours=i * 24)).date()).replace('-', '_')
-            # data_dict 每天的数据统计
-            data_dict['day'] = str(the_day)
-            data_dict['volume'] = 0
-            print(888, the_results[0], this_day)
-            for item in the_results:
-                # await self.do_find_one(this_day,item["TmID"])
-                the_data = []
-                this_day_collection = eval('db.products_{}'.format(this_day))
-                # print('11',item["TmID"],this_day_collection.find({"itemid": str(item["TmID"])}))
-                try:
-                    async for doc in this_day_collection.find({"itemid": str(item["TmID"])}).sort('createTime',
-                                                                                                  1).limit(1):
-                        # print('doc第一',doc,)
-                        the_data.append(doc)
-                    async for doc in this_day_collection.find({"itemid": str(item["TmID"])}).sort('createTime',
-                                                                                                  -1).limit(1):
-                        # print('doc最后',doc,)
-                        the_data.append(doc)
-                    if the_data:
-                        the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
-                        volume = the_num if the_num >= 0 else 0
-                    else:
-                        volume = 0
-                    data_dict['volume'] = data_dict['volume'] + volume
-                except Exception as e:
-                    print('异常', e)
-                    return self.send_message(False, 400, '异常', None)
-            all_day.append(data_dict)
-        return self.send_message(True, 0, 'success', all_day)
+            print(111, e)
+        return self.send_message(True, 0, 'success', result)
 
 
 class CountProductTopSellHandler(BaseHandler):
@@ -220,7 +177,7 @@ class CountProductTopSellHandler(BaseHandler):
 
 class CountProductHourTopSellHandler(BaseHandler):
     async def post(self, *args, **kwargs):
-        cate_id = self.verify_arg_legal(self.get_body_argument('cate_id',''), '类目id')
+        cate_id = self.verify_arg_legal(self.get_body_argument('cate_id', ''), '类目id')
         now = datetime.datetime.now()
         day = now.date()
         day_format = str(day).replace('-', '_')
@@ -240,8 +197,8 @@ class CountProductHourTopSellHandler(BaseHandler):
             pass
         else:
             cate_dict = {"$match": {"cateid": cate_id}}
-            max_list.insert(0,cate_dict)
-            min_list.insert(0,cate_dict)
+            max_list.insert(0, cate_dict)
+            min_list.insert(0, cate_dict)
 
         sec_dict = {"$match": {"createTime": {"$lte": two_hour}}}
         min_list.append(sec_dict)

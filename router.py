@@ -23,10 +23,10 @@ def make_app():
         (r"/item/commenttaglist", ItemCommentTagListDetailHandler),                  # 获取商品评论标签
         (r"/item/commentdetail", ItemCommentDetailHandler),                          # 获取商品评论详情
         (r"/count/productsellcount", CountProductSellHandler),                       # 计算20个销量
-        (r"/count/usersellcount", CountUserProductSellHandler),                      # 根据商家id计算商品销量
+        (r"/count/usersell", CountUserProductSellHandler),                           # 根据商家id计算商品销量
         (r"/count/topsell", CountProductTopSellHandler),                             # 根据销量计算全天榜单100
         (r"/count/hoursell", CountProductHourTopSellHandler),                        # 根据销量计算2个小时榜单100
-        # (r"/count/catesell", CountProductCateTopSellHandler),                        # 根据类目计算榜单100
+        # (r"/count/catesell", CountProductCateTopSellHandler),                      # 根据类目计算榜单100
         ],
         # cookie_secret = 'cb56YAgMjpevlWBNqgrv5g==',
         # login_url = '/',
