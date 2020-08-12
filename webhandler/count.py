@@ -3,6 +3,7 @@ import operator
 import threading
 
 from asgiref.sync import sync_to_async
+from tornado import queues, gen
 
 from config import MONGODB
 from tool.function import return_sqlserver_connect
@@ -29,15 +30,12 @@ db = client.spider
 
 class CountProductSellHandler(BaseHandler):
 
-    def return_data(self, collection, item, now_prv, now):
+    async def return_data(self,item):
         data_dict = {}
-        print('item', item, now_prv)
         the_data = []
-        for doc in collection.find({"itemid": str(item), "createTime": {"$gte": now_prv, "$lte": now}}):
+        async for doc in self.collection.find({"itemid": str(item), "createTime": {"$gte": self.now_prv, "$lte": self.now}}):
             # doc.pop('_id', '404')
             # doc.pop('createTime', '404')
-
-            print('doc', doc)
             the_data.append(doc)
         if the_data:
             the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
@@ -49,51 +47,71 @@ class CountProductSellHandler(BaseHandler):
             data_dict['itemid'] = item
             data_dict['volume'] = 0
             self.result.append(data_dict)
-
+    async def worker(self):
+        async for url in self.q:
+            # async for 这边是不会退出的，所以 需要下面这句 进行return退出
+            if url is None:
+                return
+            # print('更新...', url)
+            try:
+                await self.return_data(url)
+            except Exception as e:
+                print(f"exception:{e}")
+            finally:
+                # print("X................", count)
+                # 计数器，每put进入一个就加1，所以我们调用完了之后，要减去1
+                self.q.task_done()
     async def post(self, *args, **kwargs):
         self.result = []
         items = self.verify_arg_legal(self.get_body_argument('items'), '商品id')
-        now = datetime.datetime.now()
-        now_prv = datetime.datetime.now() - datetime.timedelta(hours=2)
+        self.now = datetime.datetime.now()
+        self.now_prv = datetime.datetime.now() - datetime.timedelta(hours=2)
         # now_prv = now - datetime.timedelta(hours=24 * 7) - datetime.timedelta(hours=now.hour, minutes=now.minute,
         #                                                                       seconds=now.second,
         #                                                                       microseconds=now.microsecond)
         # day = now.day
-        day = str(now_prv.date()).replace('-', '_')
+        day = str(self.now_prv.date()).replace('-', '_')
         item_list = items.split(',')
         # collection = eval('self.db.products_{}'.format(day))
         print('day', day)
-        collection = eval('db.products_{}'.format(day))
+        self.collection = eval('db.products_{}'.format(day))
         # collection = eval('self.db.product_{}'.format(21))
-        result = []
+        # result = []
+
+        self.q = queues.Queue()
         for item in item_list:
-            data_dict = {}
-            the_data = []
-            async for doc in collection.find({"itemid": str(item), "createTime": {"$gte": now_prv, "$lte": now}}):
-                # doc.pop('_id', '404')
-                # doc.pop('createTime', '404')
-                the_data.append(doc)
-            if the_data:
-                the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
-                volume = the_num if the_num >= 0 else 0
-                data_dict['itemid'] = item
-                data_dict['volume'] = volume
-                result.append(data_dict)
-            else:
-                data_dict['itemid'] = item
-                data_dict['volume'] = 0
-                result.append(data_dict)
-        # size = 20
-        # for b in [item_list[i:i + size] for i in range(0, len(item_list), size)]:
-        #     threads = []
-        #     for u in b:
-        #         t = threading.Thread(target=self.return_data, args=(collection, u, now_prv, now))
-        #         t.start()
-        #         threads.append(t)
-        #     for t in threads:
-        #         t.join()
+            await self.q.put(item)
+        workers = gen.multi([self.worker() for _ in range(10)])
+
+        # 会阻塞，直到队列里面没有数据为止
+        await self.q.join()
+        print("join")
+        for _ in range(10):
+            # 放入相应的None数量 以至协程退出
+            await self.q.put(None)
+        print("None...")
+
+        # 等待所有协程执行完毕
+        await workers
+        # for item in item_list:
+        #     data_dict = {}
+        #     the_data = []
+        #     async for doc in collection.find({"itemid": str(item), "createTime": {"$gte": now_prv, "$lte": now}}):
+        #         # doc.pop('_id', '404')
+        #         # doc.pop('createTime', '404')
+        #         the_data.append(doc)
+        #     if the_data:
+        #         the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
+        #         volume = the_num if the_num >= 0 else 0
+        #         data_dict['itemid'] = item
+        #         data_dict['volume'] = volume
+        #         result.append(data_dict)
+        #     else:
+        #         data_dict['itemid'] = item
+        #         data_dict['volume'] = 0
+        #         result.append(data_dict)
         print('主进程结束')
-        return self.send_message(True, 0, 'success', result)
+        return self.send_message(True, 0, 'success', self.result)
 
 
 class CountUserProductSellHandler(BaseHandler):
@@ -102,20 +120,20 @@ class CountUserProductSellHandler(BaseHandler):
         user_id = self.verify_arg_legal(self.get_body_argument('userid'), '商家id')
         the_type = self.verify_arg_num(self.get_body_argument('type','7'), '类型', is_num=True)
         result = []
-        try:
-            async for doc in db.users_sell.find({"ID": user_id.lower()}).sort([("_id", 1)]).limit(the_type):
-                doc.pop('_id', '404')
-                doc.pop('ID', '404')
-                doc.pop('createTime', '404')
-                result.append(doc)
-        except Exception as e:
-            print(111, e)
+        async for doc in db.users_sell.find({"ID": user_id.lower()}).sort([("_id", -1)]).limit(the_type):
+            doc.pop('_id', '404')
+            doc.pop('ID', '404')
+            doc.pop('createTime', '404')
+            result.append(doc)
         return self.send_message(True, 0, 'success', result)
 
 
 class CountProductTopSellHandler(BaseHandler):
     async def post(self, *args, **kwargs):
         cate_id = self.verify_arg_legal(self.get_body_argument('cate_id', ''), '类目id')
+        user_id = self.verify_arg_legal(self.get_body_argument('user_id', ''), '类目id')
+        if user_id and cate_id:
+            return self.send_message(False, 0, '参数错误', [])
         now = datetime.datetime.now()
         day = now.date()
         day_format = str(day).replace('-', '_')
@@ -136,6 +154,14 @@ class CountProductTopSellHandler(BaseHandler):
             max_list.insert(0, cate_dict)
             min_list.insert(0, cate_dict)
 
+        if not user_id:
+            # cate_dict = {"$match":{"cateid": "$cateid"}}
+            pass
+        else:
+            cate_dict = {"$match": {"userid": user_id}}
+            max_list.insert(0, cate_dict)
+            min_list.insert(0, cate_dict)
+
         max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
         max_list.append(max_dict)
         min_dict = {"$group": {"_id": "$itemid", "volume": {"$first": "$volume"}}}
@@ -152,13 +178,12 @@ class CountProductTopSellHandler(BaseHandler):
             the_dict = {}
             the_dict['max'] = i['volume']
             data_dict[i['_id']] = the_dict
-            # print(i)
         # cursor_min = collection.aggregate([min_dict])
         async for i in cursor_min:
             # the_dict = {}
             # the_dict['min'] = i['volume']
             data_dict[i['_id']]['min'] = i['volume']
-            # print(i)
+
         print('data_dict')
         result = []
         for k, v in data_dict.items():
