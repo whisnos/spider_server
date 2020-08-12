@@ -1,14 +1,8 @@
 import datetime
 import operator
-import threading
-
 from asgiref.sync import sync_to_async
-from tornado import queues, gen
-
 from config import MONGODB
-from tool.function import return_sqlserver_connect
 from webhandler.basehandler import BaseHandler
-import pymssql
 
 # conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1', database='TaoKe')
 # cur = conn.cursor()
@@ -23,46 +17,11 @@ client = AsyncIOMotorClient(
                                       MONGODB['db'], ))
 # client = MongoClient('39.105.179.250', 27017)
 db = client.spider
-
-
 # db.authenticate('testmongo', 'testmongo123')
 
 
 class CountProductSellHandler(BaseHandler):
 
-    async def return_data(self,):
-        data_dict = {}
-        the_data = []
-        async for doc in collection.find({"itemid": str(item), "createTime": {"$gte": now_prv, "$lte": now}}):
-            # doc.pop('_id', '404')
-            # doc.pop('createTime', '404')
-            the_data.append(doc)
-        if the_data:
-            the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
-            volume = the_num if the_num >= 0 else 0
-            data_dict['itemid'] = item
-            data_dict['volume'] = volume
-            result.append(data_dict)
-        else:
-            data_dict['itemid'] = item
-            data_dict['volume'] = 0
-            result.append(data_dict)
-    async def worker(self):
-        count = 0
-        async for url in self.q:
-            # async for 这边是不会退出的，所以 需要下面这句 进行return退出
-            if url is None:
-                return
-            print('更新...', url['itemid'])
-            try:
-                await fetch_url(url)
-            except Exception as e:
-                print(f"exception:{e}")
-            finally:
-                count += 1
-                print("X................", count)
-                # 计数器，每put进入一个就加1，所以我们调用完了之后，要减去1
-                q.task_done()
     async def post(self, *args, **kwargs):
         items = self.verify_arg_legal(self.get_body_argument('items'), '商品id')
         now = datetime.datetime.now()
@@ -78,10 +37,6 @@ class CountProductSellHandler(BaseHandler):
         collection = eval('db.products_{}'.format(day))
         # collection = eval('self.db.product_{}'.format(21))
         result = []
-        # self.q = queues.Queue()
-        # for item in item_list:
-        #     await self.q.put(item)
-        # workers = gen.multi([self.worker() for _ in range(10)])
         for item in item_list:
             data_dict = {}
             the_data = []
@@ -106,7 +61,7 @@ class CountProductSellHandler(BaseHandler):
 class CountUserProductSellHandler(BaseHandler):
 
     async def post(self, *args, **kwargs):
-        user_id = self.verify_arg_legal(self.get_body_argument('userid'), '商家id')
+        user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
         the_type = self.verify_arg_num(self.get_body_argument('type','7'), '类型', is_num=True)
         result = []
         async for doc in db.users_sell.find({"ID": user_id.lower()}).sort([("_id", -1)]).limit(the_type):
