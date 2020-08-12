@@ -218,7 +218,10 @@ class CountProductHourTopSellHandler(BaseHandler):
 
 
 class CountUserTodayTopSellHandler(BaseHandler):
-
+    def map_it(self,x):
+        data = int(x['max']) - int(x['min'])
+        data = data if data >= 0 else 0
+        return data
     async def post(self, *args, **kwargs):
         user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
         now = datetime.datetime.now()
@@ -244,15 +247,21 @@ class CountUserTodayTopSellHandler(BaseHandler):
             data_dict[i['_id']] = the_dict
         async for i in cursor_min:
             data_dict[i['_id']]['min'] = i['volume']
+        # print('data_dict',data_dict.values())
+        # the_list = map(self.map_it,data_dict.values())
+        the_list = map(self.map_it, data_dict.values())
+        # the_list = (lambda x:list(data_dict.values())[(int(x['max']) - int(x['min']) >= 0])
+        data1 =sum(the_list)
+        # print('the_list',sum(list(the_list)))
         result = []
-        data1 = 0
-        for k, v in data_dict.items():
-            the_sub = []
-            for a, b in v.items():
-                the_sub.append(b)
-            data = int(the_sub[0]) - int(the_sub[-1])
-            data = data if data >= 0 else 0
-            data1 += data
+        # data1 = 0
+        # for k, v in data_dict.items():
+        #     the_sub = []
+        #     for a, b in v.items():
+        #         the_sub.append(b)
+        #     data = int(the_sub[0]) - int(the_sub[-1])
+        #     data = data if data >= 0 else 0
+        #     data1 += data
         return_data = {}
         return_data['volume'] = data1
         result.append(return_data)
