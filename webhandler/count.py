@@ -33,21 +33,70 @@ class CountProductSellHandler(BaseHandler):
     async def return_data(self,item):
         data_dict = {}
         the_data = []
-        async for doc in self.collection.find({"itemid": str(item), "createTime": {"$gte": self.now_prv, "$lte": self.now}}):
-            # doc.pop('_id', '404')
-            # doc.pop('createTime', '404')
-            the_data.append(doc)
-        if the_data:
-            the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
-            volume = the_num if the_num >= 0 else 0
-            data_dict['itemid'] = item
-            data_dict['volume'] = volume
-            self.result.append(data_dict)
-        else:
-            data_dict['itemid'] = item
-            data_dict['volume'] = 0
-            self.result.append(data_dict)
+        min_list=[]
+        max_list=[]
+        sec_dict = {"$match": {"itemid": str(item),"createTime": {"$lte": self.now_prv}}}
+        min_list.append(sec_dict)
+        sec1_dict = {"$match": {"itemid": str(item)}}
+        max_list.append(sec1_dict)
+        max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
+        max_list.append(max_dict)
+
+        min_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
+        min_list.append(min_dict)
+        # sec_dict = {"$skip" : 3}
+
+        # print('max_list',max_list)
+        # print('min_list',min_list)
+        cursor_max = await sync_to_async(self.collection.aggregate)(max_list)
+        cursor_min = await sync_to_async(self.collection.aggregate)(min_list)
+        # async for i in cursor_min:
+        #     pass
+        #     # print(8,i)
+        # async for i in cursor_max:
+        #     print(8,i)
+
+        data_dict = {}
+        async for i in cursor_max:
+            the_dict = {}
+            the_dict['max'] = i['volume']
+            data_dict[i['_id']] = the_dict
+            # print('max',i)
+        # cursor_min = collection.aggregate([min_dict])
+        async for i in cursor_min:
+            # the_dict = {}
+            # the_dict['min'] = i['volume']
+            data_dict[i['_id']]['min'] = i['volume']
+            # print('min',i)
+        # print('data_dict',data_dict)
+        result = []
+        for k, v in data_dict.items():
+            # print(k,v)
+            the_sub = []
+            for a, b in v.items():
+                the_sub.append(b)
+            data = int(the_sub[0]) - int(the_sub[-1])
+            return_data = {}
+            return_data['itemid'] = k
+            return_data['volume'] = data
+            self.result.append(return_data)
+        new_list = sorted(result, key=operator.itemgetter('volume'), reverse=True)[:100]
+        # async for doc in self.collection.find({"itemid": str(item), "createTime": {"$gte": self.now_prv, "$lte": self.now}}):
+        #     # doc.pop('_id', '404')
+        #     # doc.pop('createTime', '404')
+        #     the_data.append(doc)
+        # if the_data:
+        #     the_num = int(the_data[-1]['volume']) - int(the_data[0]['volume'])
+        #     volume = the_num if the_num >= 0 else 0
+        #     data_dict['itemid'] = item
+        #     data_dict['volume'] = volume
+        #     self.result.append(data_dict)
+        # else:
+        #     data_dict['itemid'] = item
+        #     data_dict['volume'] = 0
+        #     self.result.append(data_dict)
     async def worker(self):
+        print('X')
         async for url in self.q:
             # async for 这边是不会退出的，所以 需要下面这句 进行return退出
             if url is None:
@@ -80,13 +129,15 @@ class CountProductSellHandler(BaseHandler):
 
         self.q = queues.Queue()
         for item in item_list:
+            print('item',item)
             await self.q.put(item)
-        workers = gen.multi([self.worker() for _ in range(10)])
+        print(2)
+        workers = gen.multi([self.worker() for _ in range(20)])
 
         # 会阻塞，直到队列里面没有数据为止
         await self.q.join()
         print("join")
-        for _ in range(10):
+        for _ in range(20):
             # 放入相应的None数量 以至协程退出
             await self.q.put(None)
         print("None...")
