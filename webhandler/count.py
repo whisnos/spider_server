@@ -17,6 +17,8 @@ client = AsyncIOMotorClient(
                                       MONGODB['db'], ))
 # client = MongoClient('39.105.179.250', 27017)
 db = client.spider
+
+
 # db.authenticate('testmongo', 'testmongo123')
 
 
@@ -62,7 +64,7 @@ class CountUserProductSellHandler(BaseHandler):
 
     async def post(self, *args, **kwargs):
         user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
-        the_type = self.verify_arg_num(self.get_body_argument('type','7'), '类型', is_num=True)
+        the_type = self.verify_arg_num(self.get_body_argument('type', '7'), '类型', is_num=True)
         result = []
         async for doc in db.users_sell.find({"ID": user_id.lower()}).sort([("_id", -1)]).limit(the_type):
             doc.pop('_id', '404')
@@ -213,6 +215,66 @@ class CountProductHourTopSellHandler(BaseHandler):
             result.append(return_data)
         new_list = sorted(result, key=operator.itemgetter('volume'), reverse=True)[:100]
         return self.send_message(True, 0, 'success', new_list)
+
+
+class CountUserTodayTopSellHandler(BaseHandler):
+
+    async def post(self, *args, **kwargs):
+        user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
+        now = datetime.datetime.now()
+        day = now.date()
+        day_format = str(day).replace('-', '_')
+        # from pymongo import MongoClient
+        # client = MongoClient('39.105.179.250', 27017)
+        # db = client.spider
+        # db.authenticate('testmongo', 'testmongo123')
+        collection = eval('db.products_{}'.format(day_format))
+
+        # collection.aggregate([{"$group": {"itemid": "$itemid", "num": {"$sum": "$likes"}}}])
+        max_list = []
+        min_list = []
+
+        cate_dict = {"$match": {"userid": user_id}}
+        max_list.insert(0, cate_dict)
+        min_list.insert(0, cate_dict)
+
+        max_dict = {"$group": {"_id": "$itemid", "volume": {"$last": "$volume"}}}
+        max_list.append(max_dict)
+        min_dict = {"$group": {"_id": "$itemid", "volume": {"$first": "$volume"}}}
+        min_list.append(min_dict)
+        cursor_max = await sync_to_async(collection.aggregate)(max_list)
+        cursor_min = await sync_to_async(collection.aggregate)(min_list)
+        data_dict = {}
+        async for i in cursor_max:
+            the_dict = {}
+            the_dict['max'] = i['volume']
+            data_dict[i['_id']] = the_dict
+            # print('max',i)
+        # cursor_min = collection.aggregate([min_dict])
+        async for i in cursor_min:
+            # the_dict = {}
+            # the_dict['min'] = i['volume']
+            data_dict[i['_id']]['min'] = i['volume']
+            # print('min',i)
+        print('data_dict',data_dict)
+        result = []
+        data1 = 0
+        for k, v in data_dict.items():
+            # print(k,v)
+            the_sub = []
+            for a, b in v.items():
+                the_sub.append(b)
+            data = int(the_sub[0]) - int(the_sub[-1])
+            data = data if data>=0 else 0
+            data1 += data
+            print('data',data)
+        return_data = {}
+        # return_data['itemid'] = k
+        return_data['volume'] = data1
+        result.append(return_data)
+        print('result',result)
+        # new_list = sorted(result, key=operator.itemgetter('volume'), reverse=True)[:100]
+        return self.send_message(True, 0, 'success', result)
 
 
 # class CountProductCateTopSellHandler(BaseHandler):
