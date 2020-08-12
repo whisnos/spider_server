@@ -224,16 +224,9 @@ class CountUserTodayTopSellHandler(BaseHandler):
         now = datetime.datetime.now()
         day = now.date()
         day_format = str(day).replace('-', '_')
-        # from pymongo import MongoClient
-        # client = MongoClient('39.105.179.250', 27017)
-        # db = client.spider
-        # db.authenticate('testmongo', 'testmongo123')
         collection = eval('db.products_{}'.format(day_format))
-
-        # collection.aggregate([{"$group": {"itemid": "$itemid", "num": {"$sum": "$likes"}}}])
         max_list = []
         min_list = []
-
         cate_dict = {"$match": {"userid": user_id}}
         max_list.insert(0, cate_dict)
         min_list.insert(0, cate_dict)
@@ -249,31 +242,20 @@ class CountUserTodayTopSellHandler(BaseHandler):
             the_dict = {}
             the_dict['max'] = i['volume']
             data_dict[i['_id']] = the_dict
-            # print('max',i)
-        # cursor_min = collection.aggregate([min_dict])
         async for i in cursor_min:
-            # the_dict = {}
-            # the_dict['min'] = i['volume']
             data_dict[i['_id']]['min'] = i['volume']
-            # print('min',i)
-        print('data_dict',data_dict)
         result = []
         data1 = 0
         for k, v in data_dict.items():
-            # print(k,v)
             the_sub = []
             for a, b in v.items():
                 the_sub.append(b)
             data = int(the_sub[0]) - int(the_sub[-1])
-            data = data if data>=0 else 0
+            data = data if data >= 0 else 0
             data1 += data
-            print('data',data)
         return_data = {}
-        # return_data['itemid'] = k
         return_data['volume'] = data1
         result.append(return_data)
-        print('result',result)
-        # new_list = sorted(result, key=operator.itemgetter('volume'), reverse=True)[:100]
         return self.send_message(True, 0, 'success', result)
 
 
