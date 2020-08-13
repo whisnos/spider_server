@@ -2,7 +2,7 @@
 import tornado.web
 
 from webhandler.count import CountProductSellHandler, CountUserProductSellHandler, CountProductTopSellHandler, \
-    CountProductHourTopSellHandler, CountUserTodayTopSellHandler
+    CountProductHourTopSellHandler, CountUserTodayTopSellHandler, ProcessUserFillSellHandler
 from webhandler.item import ItemCommentDetailHandler, ItemCommentTagListDetailHandler
 from webhandler.test import TestHandler
 
@@ -27,6 +27,7 @@ def make_app():
         (r"/count/topsell", CountProductTopSellHandler),                             # 根据销量计算全天榜单100
         (r"/count/hoursell", CountProductHourTopSellHandler),                        # 根据销量计算2个小时榜单100
         (r"/count/todaysell", CountUserTodayTopSellHandler),                         # 根据商户id计算当天销量聚合总数
+        (r"/process/fillsell", ProcessUserFillSellHandler),                          # 根据商户id计算当天销量聚合总数
         # (r"/count/catesell", CountProductCateTopSellHandler),                      # 根据类目计算榜单100
         ],
         # cookie_secret = 'cb56YAgMjpevlWBNqgrv5g==',

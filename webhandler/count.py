@@ -1,4 +1,5 @@
 import datetime
+import json
 import operator
 from asgiref.sync import sync_to_async
 from config import MONGODB
@@ -267,6 +268,15 @@ class CountUserTodayTopSellHandler(BaseHandler):
         result.append(return_data)
         return self.send_message(True, 0, 'success', result)
 
+class ProcessUserFillSellHandler(BaseHandler):
+    async def post(self, *args, **kwargs):
+        result = []
+        data = self.verify_arg_legal(self.get_body_argument('data'),'数据')
+        # try:
+        #     data_dict = json.loads(data)
+        # except Exception as e:
+        #     return self.send_message(False, 400, '非json', result)
+        return self.send_message(True, 0, 'success', result)
 
 # class CountProductCateTopSellHandler(BaseHandler):
 #     async def post(self, *args, **kwargs):

@@ -1,3 +1,5 @@
+import asyncio
+
 import tornado.web
 from tool.dbpool import DbOperate
 from tool.async_redis_pool import RedisOperate
@@ -26,22 +28,11 @@ async def run():
 
 
 class TestHandler(BaseHandler):
-    async def get(self):
+
+    @asyncio.coroutine
+    def post(self, *args, **kwargs):
         result = []
         print(55)
-        data = {
-            'id': 1,
-            'content': '测试'
-        }
-        # self.db.search_words_dtk.update_one({'id': 1}, {'$set': {'content': '酸辣辣'}})
-
-
-
-        async for doc in self.db.search_words_dtk.find().limit(2):
-            doc.pop('date', '404')
-            doc.pop('_id', '404')
-            doc.pop('isis', '404')
-            result.append(doc)
         return self.send_message(True, 0, 'success', result)
         # self.write('login')
 
