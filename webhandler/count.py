@@ -268,14 +268,19 @@ class CountUserTodayTopSellHandler(BaseHandler):
         result.append(return_data)
         return self.send_message(True, 0, 'success', result)
 
-class ProcessUserFillSellHandler(BaseHandler):
+
+class ProcessDouYinGrowHandler(BaseHandler):
     async def post(self, *args, **kwargs):
+        user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
+        the_type = self.verify_arg_num(self.get_body_argument('type', '3'), '类型', is_num=True)
         result = []
-        data = self.verify_arg_legal(self.get_body_argument('data'),'数据')
-        # try:
-        #     data_dict = json.loads(data)
-        # except Exception as e:
-        #     return self.send_message(False, 400, '非json', result)
+        day = str(datetime.datetime.now().month).replace('-', '_')
+        collection = eval('db.douyin_{}'.format(day))
+        async for doc in collection.find({"userid": user_id.lower()}).sort([("_id", -1)]).limit(the_type):
+            doc.pop('_id', '404')
+            doc.pop('userid', '404')
+            doc.pop('createTime', '404')
+            result.append(doc)
         return self.send_message(True, 0, 'success', result)
 
 # class CountProductCateTopSellHandler(BaseHandler):
