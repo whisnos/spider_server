@@ -6,7 +6,7 @@ from tool.async_redis_pool import RedisOperate
 from sms.aliyunsms import send_aliyun_send_sms
 from webhandler.basehandler import BaseHandler, check_login
 from tool import applog, function
-from config import TOKEN_TIME, SMS_VERIFY_TIME, SMS_TEMPLATE_DICT
+from config import TOKEN_TIME, SMS_VERIFY_TIME, SMS_TEMPLATE_DICT, DATABASE
 import time
 
 
@@ -29,10 +29,12 @@ async def run():
 
 class TestHandler(BaseHandler):
 
-    @asyncio.coroutine
-    def post(self, *args, **kwargs):
+    async def post(self, *args, **kwargs):
         result = []
-        print(55)
+        # try:
+        #     async with await DATABASE.transaction() as transaction:
+        #         # 处理商品库存
+        #         print(1)
         return self.send_message(True, 0, 'success', result)
         # self.write('login')
 

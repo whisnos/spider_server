@@ -1,3 +1,6 @@
+import json
+from urllib import parse
+
 import tornado.web
 import urllib.parse
 import tornado.options
@@ -174,7 +177,16 @@ class BaseHandler(tornado.web.RequestHandler):
             except ValueError as e:
                 return self.send_msg(False, 1997, '操作失败! {} 不是数字'.format(description))
 
+    def get_json_argument(self):
 
+        try:
+            url_org = parse.unquote(self.request.body.decode('utf8'))  # 解码url
+            dict_str = url_org.split('=')[-1]
+            data_dict = json.loads(dict_str)
+            return data_dict
+        except Exception as e:
+            msg = '数据格式错误'
+            return self.send_message(False, 400, msg, None)
 
 
     def get_session(self):
