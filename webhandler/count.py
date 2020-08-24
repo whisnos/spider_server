@@ -3,6 +3,7 @@ import json
 import operator
 from asgiref.sync import sync_to_async
 from config import MONGODB
+from tool import applog
 from webhandler.basehandler import BaseHandler
 
 # conn = pymssql.connect(host='192.168.32.24', port='1433', user='sa', password='shanpengfei@no1', database='TaoKe')
@@ -11,7 +12,8 @@ from pymongo import MongoClient
 
 # client = MongoClient('127.0.0.1', 27017)
 from motor.motor_asyncio import AsyncIOMotorClient
-
+log = applog.get_log('webhandler.count')
+log.setLevel('INFO')
 # client = AsyncIOMotorClient('mongodb://testmongo:testmongo123@39.105.179.250:27017/spider')
 client = AsyncIOMotorClient(
     'mongodb://{}:{}@{}:{}/{}'.format(MONGODB['user'], MONGODB['pwd'], MONGODB['host'], MONGODB['port'],
@@ -271,6 +273,7 @@ class CountUserTodayTopSellHandler(BaseHandler):
 
 class ProcessDouYinGrowHandler(BaseHandler):
     async def post(self, *args, **kwargs):
+        log.info(datetime.datetime.now(),self.request.body)
         user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
         the_type = self.verify_arg_num(self.get_body_argument('type', '3'), '类型', is_num=True)
         result = []
