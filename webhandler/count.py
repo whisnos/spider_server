@@ -291,8 +291,7 @@ class ProcessDouYinGrowHandler(BaseHandler):
 class ProcessVideoTopHandler(BaseHandler):
     async def post(self, *args, **kwargs):
         result = []
-        collection = eval('db.dataobang')
-        async for doc in collection.find().sort([("yester_sales", -1)]):
+        async for doc in db.dataobang.find().sort([("yester_sales", -1)]):
             doc.pop('_id', '404')
             doc.pop('create_time', '404')
             result.append(doc)
