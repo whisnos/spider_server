@@ -286,6 +286,19 @@ class ProcessDouYinGrowHandler(BaseHandler):
             result.append(doc)
         return self.send_message(True, 0, 'success', result)
 
+
+
+class ProcessVideoTopHandler(BaseHandler):
+    async def post(self, *args, **kwargs):
+        result = []
+        collection = eval('db.dataobang')
+        async for doc in collection.find().sort([("yester_sales", -1)]):
+            doc.pop('_id', '404')
+            doc.pop('create_time', '404')
+            result.append(doc)
+        return self.send_message(True, 0, 'success', result)
+
+
 # class CountProductCateTopSellHandler(BaseHandler):
 #     async def post(self, *args, **kwargs):
 #         cate_id = self.verify_arg_legal(self.get_body_argument('cate_id'), '类目id')
