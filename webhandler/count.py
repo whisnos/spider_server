@@ -1,6 +1,9 @@
 import datetime
 import json
 import operator
+import re
+
+from aiohttp_requests import requests
 from asgiref.sync import sync_to_async
 from config import MONGODB
 from tool import applog
@@ -12,6 +15,7 @@ from pymongo import MongoClient
 
 # client = MongoClient('127.0.0.1', 27017)
 from motor.motor_asyncio import AsyncIOMotorClient
+
 log = applog.get_log('webhandler.count')
 log.setLevel('INFO')
 # client = AsyncIOMotorClient('mongodb://testmongo:testmongo123@39.105.179.250:27017/spider')
@@ -221,10 +225,11 @@ class CountProductHourTopSellHandler(BaseHandler):
 
 
 class CountUserTodayTopSellHandler(BaseHandler):
-    def map_it(self,x):
+    def map_it(self, x):
         data = int(x['max']) - int(x['min'])
         data = data if data >= 0 else 0
         return data
+
     async def post(self, *args, **kwargs):
         user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
         now = datetime.datetime.now()
@@ -254,7 +259,7 @@ class CountUserTodayTopSellHandler(BaseHandler):
         # the_list = map(self.map_it,data_dict.values())
         the_list = map(self.map_it, data_dict.values())
         # the_list = (lambda x:list(data_dict.values())[(int(x['max']) - int(x['min']) >= 0])
-        data1 =sum(the_list)
+        data1 = sum(the_list)
         # print('the_list',sum(list(the_list)))
         result = []
         # data1 = 0
@@ -273,7 +278,7 @@ class CountUserTodayTopSellHandler(BaseHandler):
 
 class ProcessDouYinGrowHandler(BaseHandler):
     async def post(self, *args, **kwargs):
-        log.info(datetime.datetime.now(),self.request.body)
+        log.info(datetime.datetime.now(), self.request.body)
         user_id = self.verify_arg_legal(self.get_body_argument('user_id'), '商家id')
         the_type = self.verify_arg_num(self.get_body_argument('type', '3'), '类型', is_num=True)
         result = []
@@ -287,7 +292,6 @@ class ProcessDouYinGrowHandler(BaseHandler):
         return self.send_message(True, 0, 'success', result)
 
 
-
 class ProcessVideoTopHandler(BaseHandler):
     async def post(self, *args, **kwargs):
         result = []
@@ -296,6 +300,35 @@ class ProcessVideoTopHandler(BaseHandler):
             doc.pop('create_time', '404')
             result.append(doc)
         return self.send_message(True, 0, 'success', result)
+
+
+class ProcessTurnLinkHandler(BaseHandler):
+
+    async def post(self, *args, **kwargs):
+        result = []
+        link = self.verify_arg_legal(self.get_body_argument('link'), '链接')
+        the_type = self.verify_arg_num(self.get_body_argument('type'), '类型', is_num=True, ucklist=True,
+                                       user_check_list=['1', '2'])
+        try:
+            if the_type == 1:
+                r = await requests.get(link, timeout=5)
+                html = r.url
+                the_id = re.split(r"id=|&", str(html))
+                url = f'https://note.youdao.com/yws/public/note/{the_id[1]}'
+                res = await requests.get(url, timeout=5)
+                data = await res.text()
+                if data:
+                    result = data
+            else:
+                link = link + '/read'
+                r = await requests.get(link, timeout=5)
+                data = await r.text()
+                if data:
+                    result = data
+            return self.send_message(True, 0, 'success', result)
+
+        except Exception as e:
+            return self.send_message(False, 404, 'fail', result)
 
 
 # class CountProductCateTopSellHandler(BaseHandler):
