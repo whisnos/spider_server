@@ -331,6 +331,56 @@ class ProcessTurnLinkHandler(BaseHandler):
             return self.send_message(False, 404, 'fail', result)
 
 
+
+class ProcessTurnTotalHandler(BaseHandler):
+
+    async def post(self, *args, **kwargs):
+        result = {}
+        seller_id = self.verify_arg_num(self.get_body_argument('seller_id'), '卖家id', is_num=True)
+        headers = {
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "zh-CN,zh;q=0.9",
+            "cache-control": "max-age=0",
+            "referer": "https://jimeipifa.taobao.com/search.htm?spm=a1z10.3-c-s.w4002-15712722048.9.5c9124adE2V8R0&_ksTS=1600763848275_360&callback=jsonp361&mid=w-15712722048-0&wid=15712722048&path=%2Fsearch.htm&search=y&orderType=hotsell_desc&scene=taobao_shop&pageNo=1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+            "sec-fetch-dest": "script",
+            "sec-fetch-mode": "no-cors",
+            "sec-fetch-site": "same-site",
+            "cookie": "hng=CN%7Czh-CN%7CCNY%7C156; thw=cn; UM_distinctid=1744e41e6c026d-0cc99974b59799-3323766-384000-1744e41e6c156e; enc=SefTpzDEfQqrg5qyeF26qWxHpdUuuFOYCaCc7vWYTvAs2Gai9fP6XBf3WL7m7UC%2F6U1Rp4GIbUFEKYvqFlP4bw%3D%3D; _m_h5_tk=93d9bf2fd515a84201d39ad3747577de_1600408569046; _m_h5_tk_enc=07addba0c076a593a184a8dd74941850; mt=ci=0_0; tracknick=; cna=LyyhFyc44A0CARuaTgVR/hHQ; t=9b9cf0a75fee3b6089ba2cc8b4fced09; cookie2=16e284e0ca911371c56ad76fc9419c0d; v=0; _tb_token_=3b33b0350b113; _samesite_flag_=true; xlly_s=1; pnm_cku822=098%23E1hvcQvUvbpvUvCkvvvvvjiWP2sw0jYRRFMhAjivPmP9ljt8R2SpgjDbnLsZzjYbi9hvCvvvpZpgvpvhvvCvpv9CvhQvVLITj4p7%2Bu04jomxfXkOd3OiHR2UeiQ7RAYVyOvO5fVQWl4v1EQaRfU6pwethb8rjC69D70OVug7Ecqh68TJ%2BulgEfmxdX9Xd56OKvhv8vvvphvvvvvNvvCEkQvv9P6vvhi8vvmmZvvvoO%2BvvUEpvvCEkQvv9DmIvpvUvvCCnabd7ikUvpvVvpCmp%2F2pvvhvC9vhphvvvvgCvvpvvPMM; tfstk=cgB1B3tOXV0sFONqQGZeuUUtyFJfZp0B05tAf1s8LcRxcUs1iNDyPHoGi4DpwH1..; l=eBTwyrYrOsvJFuY8BOfwourza77OSIRAguPzaNbMiOCPOQfp5aNGWZr6H1T9C3GVh6-yR3-WSGYuBeYBqIcup-7Pp1EmpvHmn; isg=BP39ibQ_fnUSetq_Qwpy4zVvDFn3mjHso9AdJL9COdSD9h0oh-pBvMugoCqw9kmk"
+
+        }
+
+        base_url = f'http://store.taobao.com/shop/view_shop.htm?user_number_id={seller_id}'
+        r = await requests.get(base_url, timeout=5, headers=headers)
+        # t_url = str(r.url).split('.com')
+        t_url = re.split(r".com|.hk", str(r.url))
+        url = t_url[0] + '.com/i/asynSearch.htm?_ksTS=1600766319324_125&callback=jsonp126&mid=w-15758243595-0&wid=15758243595'
+
+        # print('url',url)
+        try:
+            r = await requests.get(url, headers=headers)
+            html = await r.text()
+            # print('html', html)
+            videro_Obj = re.search(r'共搜索到<span> (.*?) </span>', html, re.M | re.I)
+            num = videro_Obj.group(1)
+            # print(1, num)
+        except Exception as e:
+            url = t_url[0] + '.com/i/asynSearch.htm?callback=jsonp361&mid=w-15712722048-0&pageNo=1'
+            r = await requests.get(url, headers=headers)
+            html = await r.text()
+            # print('html', html)
+            videro_Obj = re.search(r'共搜索到<span> (.*?) </span>', html, re.M | re.I)
+            try:
+                num = videro_Obj.group(1)
+            except Exception as e:
+                num = 0
+            # print(2, num)
+
+        result['total'] = num
+        return self.send_message(True, 0, 'success', result)
+
+
 # class CountProductCateTopSellHandler(BaseHandler):
 #     async def post(self, *args, **kwargs):
 #         cate_id = self.verify_arg_legal(self.get_body_argument('cate_id'), '类目id')
