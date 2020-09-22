@@ -377,7 +377,7 @@ class ProcessTurnTotalHandler(BaseHandler):
                 num = 0
             # print(2, num)
 
-        result['total'] = num
+        result['total'] = int(num)
         return self.send_message(True, 0, 'success', result)
 
 
