@@ -2,7 +2,7 @@ import datetime
 import json
 import operator
 import re
-
+import requests as req
 from aiohttp_requests import requests
 from asgiref.sync import sync_to_async
 from config import MONGODB
@@ -353,7 +353,7 @@ class ProcessTurnTotalHandler(BaseHandler):
 
         base_url = f'http://store.taobao.com/shop/view_shop.htm?user_number_id={seller_id}'
         print(1,base_url)
-        r = await requests.get(base_url, timeout=5, headers=headers)
+        r = req.get(base_url, timeout=5, headers=headers)
         # t_url = str(r.url).split('.com')
         print(r.url)
         t_url = re.split(r".com|.hk", str(r.url))
