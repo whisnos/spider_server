@@ -352,8 +352,10 @@ class ProcessTurnTotalHandler(BaseHandler):
         }
 
         base_url = f'http://store.taobao.com/shop/view_shop.htm?user_number_id={seller_id}'
+        print(1,base_url)
         r = await requests.get(base_url, timeout=5, headers=headers)
         # t_url = str(r.url).split('.com')
+        print(r.url)
         t_url = re.split(r".com|.hk", str(r.url))
         url = t_url[0] + '.com/i/asynSearch.htm?_ksTS=1600766319324_125&callback=jsonp126&mid=w-15758243595-0&wid=15758243595'
 
