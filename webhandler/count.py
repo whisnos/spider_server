@@ -2,7 +2,7 @@ import datetime
 import json
 import operator
 import re
-import requests as req
+
 from aiohttp_requests import requests
 from asgiref.sync import sync_to_async
 from config import MONGODB
@@ -352,18 +352,15 @@ class ProcessTurnTotalHandler(BaseHandler):
         }
 
         base_url = f'http://store.taobao.com/shop/view_shop.htm?user_number_id={seller_id}'
-        print(1,base_url)
-        r = req.get(base_url, timeout=5, headers=headers)
+        r = await requests.get(base_url, timeout=5, headers=headers)
         # t_url = str(r.url).split('.com')
         print(r.url)
         t_url = re.split(r".com|.hk", str(r.url))
         url = t_url[0] + '.com/i/asynSearch.htm?_ksTS=1600766319324_125&callback=jsonp126&mid=w-15758243595-0&wid=15758243595'
 
-        print('url',url)
         try:
             r = await requests.get(url, headers=headers)
             html = await r.text()
-            print('html', html)
             videro_Obj = re.search(r'共搜索到<span> (.*?) </span>', html, re.M | re.I)
             num = videro_Obj.group(1)
             # print(1, num)
@@ -371,13 +368,11 @@ class ProcessTurnTotalHandler(BaseHandler):
             url = t_url[0] + '.com/i/asynSearch.htm?callback=jsonp361&mid=w-15712722048-0&pageNo=1'
             r = await requests.get(url, headers=headers)
             html = await r.text()
-            print('html', html)
             videro_Obj = re.search(r'共搜索到<span> (.*?) </span>', html, re.M | re.I)
             try:
                 num = videro_Obj.group(1)
             except Exception as e:
                 num = 0
-            print(2, num)
 
         result['total'] = int(num)
         return self.send_message(True, 0, 'success', result)
