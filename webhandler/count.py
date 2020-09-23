@@ -357,11 +357,11 @@ class ProcessTurnTotalHandler(BaseHandler):
         t_url = re.split(r".com|.hk", str(r.url))
         url = t_url[0] + '.com/i/asynSearch.htm?_ksTS=1600766319324_125&callback=jsonp126&mid=w-15758243595-0&wid=15758243595'
 
-        # print('url',url)
+        print('url',url)
         try:
             r = await requests.get(url, headers=headers)
             html = await r.text()
-            # print('html', html)
+            print('html', html)
             videro_Obj = re.search(r'共搜索到<span> (.*?) </span>', html, re.M | re.I)
             num = videro_Obj.group(1)
             # print(1, num)
@@ -369,13 +369,13 @@ class ProcessTurnTotalHandler(BaseHandler):
             url = t_url[0] + '.com/i/asynSearch.htm?callback=jsonp361&mid=w-15712722048-0&pageNo=1'
             r = await requests.get(url, headers=headers)
             html = await r.text()
-            # print('html', html)
+            print('html', html)
             videro_Obj = re.search(r'共搜索到<span> (.*?) </span>', html, re.M | re.I)
             try:
                 num = videro_Obj.group(1)
             except Exception as e:
                 num = 0
-            # print(2, num)
+            print(2, num)
 
         result['total'] = int(num)
         return self.send_message(True, 0, 'success', result)
