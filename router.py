@@ -3,7 +3,7 @@ import tornado.web
 
 from webhandler.count import CountProductSellHandler, CountUserProductSellHandler, CountProductTopSellHandler, \
     CountProductHourTopSellHandler, CountUserTodayTopSellHandler, ProcessDouYinGrowHandler, ProcessVideoTopHandler, \
-    ProcessTurnLinkHandler, ProcessTurnTotalHandler
+    ProcessTurnLinkHandler, ProcessProductInfoHandler
 from webhandler.item import ItemCommentDetailHandler, ItemCommentTagListDetailHandler
 from webhandler.test import TestHandler
 
@@ -31,7 +31,8 @@ def make_app():
         (r"/process/douyingrow", ProcessDouYinGrowHandler),                          # 动态查看抖音主播粉丝增量
         (r"/process/videotop", ProcessVideoTopHandler),                              # 处理 有道
         (r"/process/turnlink", ProcessTurnLinkHandler),                              # 直播榜单数据
-        (r"/process/turntotal", ProcessTurnTotalHandler),                              # 返回店铺销量
+        # (r"/process/turntotal", ProcessTurnTotalHandler),                          # 返回店铺销量
+        (r"/process/productinfo", ProcessProductInfoHandler),                        # 返回产品信息
         # (r"/count/catesell", CountProductCateTopSellHandler),                      # 根据类目计算榜单100
         ],
         # cookie_secret = 'cb56YAgMjpevlWBNqgrv5g==',
