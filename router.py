@@ -3,7 +3,7 @@ import tornado.web
 
 from webhandler.count import CountProductSellHandler, CountUserProductSellHandler, CountProductTopSellHandler, \
     CountProductHourTopSellHandler, CountUserTodayTopSellHandler, ProcessDouYinGrowHandler, ProcessVideoTopHandler, \
-    ProcessTurnLinkHandler, ProcessProductInfoHandler
+    ProcessTurnLinkHandler, ProcessProductInfoHandler, ProcessProductTypeHandler
 from webhandler.item import ItemCommentDetailHandler, ItemCommentTagListDetailHandler
 from webhandler.test import TestHandler
 
@@ -33,6 +33,7 @@ def make_app():
         (r"/process/turnlink", ProcessTurnLinkHandler),                              # 直播榜单数据
         # (r"/process/turntotal", ProcessTurnTotalHandler),                          # 返回店铺销量
         (r"/process/productinfo", ProcessProductInfoHandler),                        # 返回产品信息
+        (r"/process/producttype", ProcessProductTypeHandler),                        # 返回产品信息
         # (r"/count/catesell", CountProductCateTopSellHandler),                      # 根据类目计算榜单100
         ],
         # cookie_secret = 'cb56YAgMjpevlWBNqgrv5g==',
