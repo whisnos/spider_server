@@ -450,7 +450,7 @@ class ProcessProductTypeHandler(BaseHandler):
             "accept-encoding": "deflate, br",
             "accept-language": "zh-CN,zh;q=0.9",
             "cache-control": "max-age=0",
-            # "cookie": "thw=cn; t=542f1e2cff978cd3ce41ce73b9f58667; hng=CN%7Czh-CN%7CCNY%7C156; cna=euxjFFhX2gMCAXlFQnIQHrAr; tg=0; enc=ZVT3Hc7%2B786pHfqzgwW%2F87QATIsEy8kTHVSncr4LUKplt8mIyOmSTYUdsjB68Gqo6XC3l0edXXFyg0i0J6f7CQ%3D%3D; x=e%3D1%26p%3D*%26s%3D0%26c%3D0%26f%3D0%26g%3D0%26t%3D0%26__ll%3D-1%26_ato%3D0; tracknick=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; lgc=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; mt=ci=61_1&np=; UM_distinctid=166d898fad45d9-02af0c52416d6e-69101b7d-1fa400-166d898fad5684; v=0; cookie2=7b9bffbb6f3d2e003df7259d68739df2; _tb_token_=f8358010b035b; publishItemObj=Ng%3D%3D; dnk=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; alitrackid=www.taobao.com; swfstore=308788; unb=326621184; sg=%E7%8C%AA41; _l_g_=Ug%3D%3D; skt=6c83d679bc51e3f9; cookie1=WvFfxcUdGYC1tTPQndOB0qqxoocWWDnX1hz%2BEwLk4p0%3D; csg=922c12a5; uc3=vt3=F8dByR%2FKEDxrLIHovJk%3D&id2=UNJXwAw5pyqt&nk2=13MctR4KUoQ%3D&lg2=UIHiLt3xD8xYTw%3D%3D; existShop=MTU0MTQ5MjcwNQ%3D%3D; _cc_=VT5L2FSpdA%3D%3D; _nk_=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; cookie17=UNJXwAw5pyqt; uc1=cookie16=W5iHLLyFPlMGbLDwA%2BdvAGZqLg%3D%3D&cookie21=V32FPkk%2FhodqgY9Lqf5dEg%3D%3D&cookie15=W5iHLLyFOGW7aA%3D%3D&existShop=true&pas=0&cookie14=UoTYN4WjJ%2B5FAA%3D%3D&tag=8&lng=zh_CN; lastalitrackid=item.taobao.com; JSESSIONID=3DCB7DCCB88F4FDD1AA68F60A51C7EF8; isg=BPf3mIraYC_BkeSex7TMOKcghuuBFMjQK2tsx0mkE0Yt-Bc6UYxbbrXS3hgDEKOW; whl=-1%260%260%261541493841736",
+            "cookie": "thw=cn; t=542f1e2cff978cd3ce41ce73b9f58667; hng=CN%7Czh-CN%7CCNY%7C156; cna=euxjFFhX2gMCAXlFQnIQHrAr; tg=0; enc=ZVT3Hc7%2B786pHfqzgwW%2F87QATIsEy8kTHVSncr4LUKplt8mIyOmSTYUdsjB68Gqo6XC3l0edXXFyg0i0J6f7CQ%3D%3D; x=e%3D1%26p%3D*%26s%3D0%26c%3D0%26f%3D0%26g%3D0%26t%3D0%26__ll%3D-1%26_ato%3D0; tracknick=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; lgc=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; mt=ci=61_1&np=; UM_distinctid=166d898fad45d9-02af0c52416d6e-69101b7d-1fa400-166d898fad5684; v=0; cookie2=7b9bffbb6f3d2e003df7259d68739df2; _tb_token_=f8358010b035b; publishItemObj=Ng%3D%3D; dnk=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; alitrackid=www.taobao.com; swfstore=308788; unb=326621184; sg=%E7%8C%AA41; _l_g_=Ug%3D%3D; skt=6c83d679bc51e3f9; cookie1=WvFfxcUdGYC1tTPQndOB0qqxoocWWDnX1hz%2BEwLk4p0%3D; csg=922c12a5; uc3=vt3=F8dByR%2FKEDxrLIHovJk%3D&id2=UNJXwAw5pyqt&nk2=13MctR4KUoQ%3D&lg2=UIHiLt3xD8xYTw%3D%3D; existShop=MTU0MTQ5MjcwNQ%3D%3D; _cc_=VT5L2FSpdA%3D%3D; _nk_=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; cookie17=UNJXwAw5pyqt; uc1=cookie16=W5iHLLyFPlMGbLDwA%2BdvAGZqLg%3D%3D&cookie21=V32FPkk%2FhodqgY9Lqf5dEg%3D%3D&cookie15=W5iHLLyFOGW7aA%3D%3D&existShop=true&pas=0&cookie14=UoTYN4WjJ%2B5FAA%3D%3D&tag=8&lng=zh_CN; lastalitrackid=item.taobao.com; JSESSIONID=3DCB7DCCB88F4FDD1AA68F60A51C7EF8; isg=BPf3mIraYC_BkeSex7TMOKcghuuBFMjQK2tsx0mkE0Yt-Bc6UYxbbrXS3hgDEKOW; whl=-1%260%260%261541493841736",
             # "cookie": "l=eBEVsWImQvb9glxLBOfanurza77OSIRYYuPzaNbMiOCP91fB5vK5WZY_RcT6C3Gch6kwR3mw4YKMBeYBq7VonxvtIosM_Ckmn; isg=BBQUzxOGNj6uI6Ly2n4MVK-75VKGbThXLV3PU671oB8imbTj1n0I58qbnZABYXCv; uc1=cookie16=Vq8l%2BKCLySLZMFWHxqs8fwqnEw%3D%3D&cookie15=W5iHLLyFOGW7aA%3D%3D&cookie14=UoTV75eOiAeO%2Bw%3D%3D&cookie21=VT5L2FSpdet0IDFKDIAGvQ%3D%3D&existShop=true&pas=0; v=0; dnk=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; cookie1=WvFfxcUdGYC1tTPQndOB0qqxoocWWDnX1hz%2BEwLk4p0%3D; _l_g_=Ug%3D%3D; uc4=id4=0%40UgXQysjHsRIXCi48wgVeHeBGsuA%3D&nk4=0%401bwfHinaO3lGfbNRE8P8%2Fvu4eA%3D%3D; cookie2=1c11b50df63808141eadd222abb4a139; publishItemObj=Ng%3D%3D; _nk_=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; existShop=MTU5MzQxMDcxOQ%3D%3D; mt=ci=118_1; lgc=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; sg=%E7%8C%AA41; _cc_=URm48syIZQ%3D%3D; cookie17=UNJXwAw5pyqt; tfstk=coQcB_Yzri-XX6tlArTfsbKrNuqdZCi2pNSFzZMQoR4PmhQPi1nrYoGYZCBcWc1..; csg=e45831e5; uc3=id2=UNJXwAw5pyqt&lg2=URm48syIIVrSKA%3D%3D&vt3=F8dBxGJsyCR%2FDeZTeOs%3D&nk2=13MctR4KUoQ%3D; unb=326621184; skt=243ee7596e9a211a; sgcookie=EpfIrZIDPhrFEb00RoD6b; tracknick=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; thw=cn; cna=kXKAFzxt2QACATs5mZk++lF4; t=7f6b1cc46d8e55ceb30780c3ead57b4b; _tb_token_=350980ebe6718; _samesite_flag_=true",
             "referer": "https://s.taobao.com/search?q=%E4%B9%8C%E9%BE%9F%E9%A5%B2%E6%96%99&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20181104&ie=utf8",
             "upgrade-insecure-requests": "1",
@@ -462,8 +462,9 @@ class ProcessProductTypeHandler(BaseHandler):
         # # time.sleep(0.05)
         # # base_url = 'http://h5api.m.taobao.com/h5/mtop.taobao.detail.getdetail/6.0/?type=jsonp&dataType=jsonp&data=%7B%22id%22%3A%22604347120011%22%2C%22itemNumId%22%3A%22604347120011%22%2C%22itemId%22%3A%22604347120011%22%2C%22exParams%22%3A%22%7B%5C%22id%5C%22%3A%5C%22528234280515%5C%22%7D%22%2C%22detail_v%22%3A%228.0.0%22%2C%22utdid%22%3A%221%22%7D'
         the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=0&city=0&yys=0&port=11&time=1&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
-        #
+        the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=&city=0&yys=0&port=11&time=1&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
         try:
+            pass
             the_proxy_res = await requests.get(the_url)
             the_proxy_data = await the_proxy_res.text()
             print('the_proxy_data',the_proxy_data)
@@ -483,7 +484,7 @@ class ProcessProductTypeHandler(BaseHandler):
         #     # print(88,res.text)
         except Exception as e:
             print(11111,e)
-            return self.send_message(False, 400, 'fail', result)
+            return self.send_message(False, 400, 'ip获取失败', result)
         # print(3333, the_data, type(the_data))
         # data_dict = json.loads(the_data)
         # print('the_data', data_dict)
@@ -501,30 +502,47 @@ class ProcessProductTypeHandler(BaseHandler):
         # url_com = f'https://{shop_name}.taobao.com/company.htm'
         # res = await requests.get(url_com,headers,proxies)
         # html = await res.text()
+        # try:
+        #     res = req.get(url)
+        #     html = res.text
+        #     Shop_Obj = re.search(r"url : '//(.*?).taobao.com/'", html, re.M | re.I)
+        #     print(6666666666666666666)
+        #     shop_name = Shop_Obj.group(1)
+        # except Exception as e:
+        #     print('请求失败',e)
+        #     return self.send_message(False, 400, '请重试', result)
+        # url_com = f'https://{shop_name}.taobao.com/company.htm'
+        # res = req.get(url_com)
+        # html = res.text
+
         try:
-            res = req.get(url,headers=headers, proxies=proxies)
+            url = f'https://item.taobao.com/item.htm?id={itemid}'
+            res = req.get(url, headers=headers, proxies=proxies)
             html = res.text
             Shop_Obj = re.search(r"url : '//(.*?).taobao.com/'", html, re.M | re.I)
             shop_name = Shop_Obj.group(1)
+
+            url_com = f'https://{shop_name}.taobao.com/company.htm'
+            res = req.get(url_com, headers=headers, proxies=proxies)
+            html = res.text
+            if 'TB1W_vlJFXXXXXxXXXXXXXXXXXX' in html:
+                the_type = ('ifashion')
+            elif 'TB1M0QCNpXXXXaWXXXXXXXXXXXX' in html:
+                the_type = ('亲宝贝')
+            elif 'TB1ekNeKFXXXXcXXFXXwu0bFXXX' in html:
+                the_type = ('极有家')
+            elif 'TB1i1QuDNSYBuNjSsphXXbGvVXa' in html:
+                the_type = ('全球购')
+            elif '营业执照' in html:
+                the_type = ('企业店铺')
+            else:
+                the_type = ('个人')
+            result['type'] = the_type
         except Exception as e:
-            print('请求失败',e)
-            return self.send_message(False, 400, '请重试', result)
-        url_com = f'https://{shop_name}.taobao.com/company.htm'
-        res = req.get(url_com,headers=headers, proxies=proxies)
-        html = res.text
-        if 'TB1W_vlJFXXXXXxXXXXXXXXXXXX' in html:
-            the_type = ('ifashion')
-        elif 'TB1M0QCNpXXXXaWXXXXXXXXXXXX' in html:
-            the_type = ('亲宝贝')
-        elif 'TB1ekNeKFXXXXcXXFXXwu0bFXXX' in html:
-            the_type = ('极有家')
-        elif 'TB1i1QuDNSYBuNjSsphXXbGvVXa' in html:
-            the_type = ('全球购')
-        elif '营业执照' in html:
-            the_type = ('企业店铺')
-        else:
-            the_type = ('个人')
-        result['type'] = the_type
+            print(e)
+            result['type'] = '请重试'
+        s = req.session()
+        s.keep_alive = False
         return self.send_message(True, 0, 'success', result)
 # class CountProductCateTopSellHandler(BaseHandler):
 #     async def post(self, *args, **kwargs):
