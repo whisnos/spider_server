@@ -407,6 +407,7 @@ class ProcessProductInfoHandler(BaseHandler):
 
         try:
             the_proxy_res = await requests.get(the_url)
+            # print(the_proxy_res)
             the_proxy_data = await the_proxy_res.text()
             pro = json.loads(the_proxy_data)['data'][0]
             proxies = {
@@ -422,15 +423,19 @@ class ProcessProductInfoHandler(BaseHandler):
         except Exception as e:
             print(11111,e)
             return self.send_message(False, 400, 'fail', result)
-        print(3333, the_data, type(the_data))
+        # print(3333, the_data, type(the_data))
         data_dict = json.loads(the_data)
-        print('the_data', data_dict)
+        # print('the_data', data_dict)
         # status, response = await async_http_response(base_url,pro, headers=headers)
         # print(response)
+        apiStack =data_dict['data']['apiStack'][0]['value']
+        apiStack_dict = json.loads(apiStack)
+        vagueSellCount = apiStack_dict['item']['vagueSellCount']
         # if not status:
         #     return self.send_message(False, 400, 'fail', result)
         # data_dict = json.loads(the_data)
         result['allItemCount']=data_dict['data']['seller']['allItemCount']
+        result['vagueSellCount']=vagueSellCount
         result['creditLevel']=data_dict['data']['seller']['creditLevel']
         result['commentCount']=data_dict['data']['item']['commentCount']
         result['evaluates']=data_dict['data']['seller']['evaluates']
