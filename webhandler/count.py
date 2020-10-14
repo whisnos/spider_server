@@ -403,28 +403,17 @@ class ProcessProductInfoHandler(BaseHandler):
         # response = await httpclient.AsyncHTTPClient().fetch(base_url,headers=headers)
         # time.sleep(0.05)
         # base_url = 'http://h5api.m.taobao.com/h5/mtop.taobao.detail.getdetail/6.0/?type=jsonp&dataType=jsonp&data=%7B%22id%22%3A%22604347120011%22%2C%22itemNumId%22%3A%22604347120011%22%2C%22itemId%22%3A%22604347120011%22%2C%22exParams%22%3A%22%7B%5C%22id%5C%22%3A%5C%22528234280515%5C%22%7D%22%2C%22detail_v%22%3A%228.0.0%22%2C%22utdid%22%3A%221%22%7D'
-        the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=0&city=0&yys=0&port=11&time=1&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
-
+        # the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=0&city=0&yys=0&port=11&time=1&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
+        # the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=&city=0&yys=0&port=11&pack=28800&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
         try:
-            the_proxy_res = await requests.get(the_url)
-            # print(the_proxy_res)
-            the_proxy_data = await the_proxy_res.text()
-            pro = json.loads(the_proxy_data)['data'][0]
-            proxies = {
-                'http': 'http://{}:{}'.format(pro['ip'], pro['port']),
-            }
-            res = req.get(base_url, headers=headers, proxies=proxies)
-            # res = await requests.get(base_url,headers=headers)
-            # the_data = await res.text()
-            # status, res = await async_http_response(base_url, proxies, headers=headers)
+            status, res = await async_http_response(base_url, headers=headers)
             print(99,res)
-            the_data =res.text
             # print(88,res.text)
         except Exception as e:
             print(11111,e)
             return self.send_message(False, 400, 'fail', result)
         # print(3333, the_data, type(the_data))
-        data_dict = json.loads(the_data)
+        data_dict = json.loads(res)
         # print('the_data', data_dict)
         # status, response = await async_http_response(base_url,pro, headers=headers)
         # print(response)
