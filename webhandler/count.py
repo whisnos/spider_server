@@ -406,22 +406,22 @@ class ProcessProductInfoHandler(BaseHandler):
         # the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=0&city=0&yys=0&port=11&time=1&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
         # the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=&city=0&yys=0&port=11&pack=28800&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
         try:
-            while True:
-                status, res = await async_http_response(base_url, headers=headers)
-                print(99,res[:40])
-                try:
-                    data_dict = json.loads(res)
-                    if data_dict['api']:
-                        pass
-                    break
-                except:
-                    continue
+            # while True:
+            status, res = await async_http_response(base_url, headers=headers)
+                # print(99,res[:40])
+                # try:
+                #     data_dict = json.loads(res)
+                #     if data_dict['api']:
+                #         pass
+                #     break
+                # except:
+                #     continue
             # print(88,res.text)
         except Exception as e:
             print(11111,e)
             return self.send_message(False, 400, 'fail', result)
         # print(3333, the_data, type(the_data))
-        # data_dict = json.loads(res)
+        data_dict = json.loads(res)
         # print('the_data', data_dict)
         # status, response = await async_http_response(base_url,pro, headers=headers)
         # print(response)
