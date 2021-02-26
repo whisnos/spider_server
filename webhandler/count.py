@@ -2,6 +2,8 @@ import datetime
 import json
 import operator
 import re
+import time
+
 import requests as req
 from aiohttp_requests import requests
 
@@ -386,17 +388,18 @@ class ProcessProductInfoHandler(BaseHandler):
 
     async def post(self, *args, **kwargs):
         result = {}
+        # print(self.request.body)
         itemid = self.verify_arg_num(self.get_body_argument('itemid'), '商品id', is_num=True)
         headers = {
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "accept-encoding": "deflate, br",
-            "accept-language": "zh-CN,zh;q=0.9",
-            "cache-control": "max-age=0",
-            # "cookie": "thw=cn; t=542f1e2cff978cd3ce41ce73b9f58667; hng=CN%7Czh-CN%7CCNY%7C156; cna=euxjFFhX2gMCAXlFQnIQHrAr; tg=0; enc=ZVT3Hc7%2B786pHfqzgwW%2F87QATIsEy8kTHVSncr4LUKplt8mIyOmSTYUdsjB68Gqo6XC3l0edXXFyg0i0J6f7CQ%3D%3D; x=e%3D1%26p%3D*%26s%3D0%26c%3D0%26f%3D0%26g%3D0%26t%3D0%26__ll%3D-1%26_ato%3D0; tracknick=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; lgc=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; mt=ci=61_1&np=; UM_distinctid=166d898fad45d9-02af0c52416d6e-69101b7d-1fa400-166d898fad5684; v=0; cookie2=7b9bffbb6f3d2e003df7259d68739df2; _tb_token_=f8358010b035b; publishItemObj=Ng%3D%3D; dnk=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; alitrackid=www.taobao.com; swfstore=308788; unb=326621184; sg=%E7%8C%AA41; _l_g_=Ug%3D%3D; skt=6c83d679bc51e3f9; cookie1=WvFfxcUdGYC1tTPQndOB0qqxoocWWDnX1hz%2BEwLk4p0%3D; csg=922c12a5; uc3=vt3=F8dByR%2FKEDxrLIHovJk%3D&id2=UNJXwAw5pyqt&nk2=13MctR4KUoQ%3D&lg2=UIHiLt3xD8xYTw%3D%3D; existShop=MTU0MTQ5MjcwNQ%3D%3D; _cc_=VT5L2FSpdA%3D%3D; _nk_=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; cookie17=UNJXwAw5pyqt; uc1=cookie16=W5iHLLyFPlMGbLDwA%2BdvAGZqLg%3D%3D&cookie21=V32FPkk%2FhodqgY9Lqf5dEg%3D%3D&cookie15=W5iHLLyFOGW7aA%3D%3D&existShop=true&pas=0&cookie14=UoTYN4WjJ%2B5FAA%3D%3D&tag=8&lng=zh_CN; lastalitrackid=item.taobao.com; JSESSIONID=3DCB7DCCB88F4FDD1AA68F60A51C7EF8; isg=BPf3mIraYC_BkeSex7TMOKcghuuBFMjQK2tsx0mkE0Yt-Bc6UYxbbrXS3hgDEKOW; whl=-1%260%260%261541493841736",
-            # "cookie": "l=eBEVsWImQvb9glxLBOfanurza77OSIRYYuPzaNbMiOCP91fB5vK5WZY_RcT6C3Gch6kwR3mw4YKMBeYBq7VonxvtIosM_Ckmn; isg=BBQUzxOGNj6uI6Ly2n4MVK-75VKGbThXLV3PU671oB8imbTj1n0I58qbnZABYXCv; uc1=cookie16=Vq8l%2BKCLySLZMFWHxqs8fwqnEw%3D%3D&cookie15=W5iHLLyFOGW7aA%3D%3D&cookie14=UoTV75eOiAeO%2Bw%3D%3D&cookie21=VT5L2FSpdet0IDFKDIAGvQ%3D%3D&existShop=true&pas=0; v=0; dnk=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; cookie1=WvFfxcUdGYC1tTPQndOB0qqxoocWWDnX1hz%2BEwLk4p0%3D; _l_g_=Ug%3D%3D; uc4=id4=0%40UgXQysjHsRIXCi48wgVeHeBGsuA%3D&nk4=0%401bwfHinaO3lGfbNRE8P8%2Fvu4eA%3D%3D; cookie2=1c11b50df63808141eadd222abb4a139; publishItemObj=Ng%3D%3D; _nk_=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; existShop=MTU5MzQxMDcxOQ%3D%3D; mt=ci=118_1; lgc=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; sg=%E7%8C%AA41; _cc_=URm48syIZQ%3D%3D; cookie17=UNJXwAw5pyqt; tfstk=coQcB_Yzri-XX6tlArTfsbKrNuqdZCi2pNSFzZMQoR4PmhQPi1nrYoGYZCBcWc1..; csg=e45831e5; uc3=id2=UNJXwAw5pyqt&lg2=URm48syIIVrSKA%3D%3D&vt3=F8dBxGJsyCR%2FDeZTeOs%3D&nk2=13MctR4KUoQ%3D; unb=326621184; skt=243ee7596e9a211a; sgcookie=EpfIrZIDPhrFEb00RoD6b; tracknick=%5Cu7EAF%5Cu91D1%5Cu732A%5Cu732A; thw=cn; cna=kXKAFzxt2QACATs5mZk++lF4; t=7f6b1cc46d8e55ceb30780c3ead57b4b; _tb_token_=350980ebe6718; _samesite_flag_=true",
-            "referer": "https://s.taobao.com/search?q=%E4%B9%8C%E9%BE%9F%E9%A5%B2%E6%96%99&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20181104&ie=utf8",
-            "upgrade-insecure-requests": "1",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3298.4 Safari/537.36",
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'zh-CN,zh;q=0.9',
+            'cookie': 'hng=CN%7Czh-CN%7CCNY%7C156; thw=cn; _w_app_lg=0; UM_distinctid=1744e41e6c026d-0cc99974b59799-3323766-384000-1744e41e6c156e; WAPFDFDTGFG=%2B4cMKKP%2B8PI%2BKKw%2FL7qe6F2ZaB7%2F21E%3D; t=8622a795df71804899414f0cf8bdf67a; lLtC1_=1; xlly_s=1; _m_h5_tk=4c10e9a98a772ce352d619d350cf0174_1609230826515; _m_h5_tk_enc=6499c253ec51c4944b0eafdbdf4c4127; _tb_token_=3edee363751e5; cookie2=1ed0a934dad1bbbee3d29529f62f0ac1; _samesite_flag_=true; enc=xZQPO7jdGbUpUY29DLZO4fmNi%2BaAcKnGwnpHSWp7pLc%2FVEqtRh1TZOUMCnqHIU6lJRv%2FDNm%2BqLGpXDjPBlOhRw%3D%3D; cna=LyyhFyc44A0CARuaTgVR/hHQ; unb=1993493430; lgc=%5Cu65FA%5Cu4ED4%5Cu5C71%5Cu4EBA; cookie17=UojdSKvUD44AjA%3D%3D; dnk=%5Cu65FA%5Cu4ED4%5Cu5C71%5Cu4EBA; tracknick=%5Cu65FA%5Cu4ED4%5Cu5C71%5Cu4EBA; _l_g_=Ug%3D%3D; sg=%E4%BA%BA01; _nk_=%5Cu65FA%5Cu4ED4%5Cu5C71%5Cu4EBA; cookie1=ACi3eykYweNx1cZFK9GeVtJ%2FBXnXn7HBk98Cn9bhNwM%3D; sgcookie=E100mQcrntc0%2Bod7ufwFSV6LWeqba4wk5NM4bNJbggLqQZohAXXSzkgypEWRQXJTiUIwydTxhq6d7xQk3i4ZsqAUUQ%3D%3D; uc3=id2=UojdSKvUD44AjA%3D%3D&nk2=rp%2Bt3Piby5U%3D&lg2=WqG3DMC9VAQiUQ%3D%3D&vt3=F8dCuAMkO9ptAyjFZfY%3D; csg=631f83e7; skt=a69a1f308bc798d6; existShop=MTYwOTIyMzA3MA%3D%3D; uc4=nk4=0%40rMWckYOnA0w6ZrKITWR1qpKcWg%3D%3D&id4=0%40UOBZkjwJe%2FNZohPoLJfCKmdv%2Bk1f; _cc_=VT5L2FSpdA%3D%3D; v=0; mt=ci=8_1; uc1=cookie15=VFC%2FuZ9ayeYq2g%3D%3D&cookie21=W5iHLLyFeYZ1WM9hVnmS&pas=0&cookie14=Uoe0ZNTWPH8HPw%3D%3D&cookie16=WqG3DMC9UpAPBHGz5QBErFxlCA%3D%3D&existShop=false; x5sec=7b22617365727665723b32223a223066653836323466323561383165393364636464333864666535383266393131434b4b58712f3846454b334d742f4c712f4b6a6376674561444445354f544d304f544d304d7a41374d513d3d227d; l=eBI5jNc7OWssh06-BOfZourza77T7IRfguPzaNbMiOCP_u5p5IxCWZ-Z49Y9CnGVH62vR3-WSGYkBanXqyISnxv9-NGCxOmtndC..; tfstk=cPmCBAwKp6fC2C8PYv9aUAn6YOr5Zbf_Uew-d2cs2qIvQRMCibj4GRWnrsjTkR1..; isg=BHFxL5KmiuozliaC-Euea7ragP0LXuXQF8wBAFOGWzhXepHMmq_3oRWTmA4csn0I',
+            'referer': 'https://h5.m.taobao.com/awp/core/detail.htm?spm=a1z09.2.0.0.4ab22e8dy7xLXd&id=567675653349&_u=31rd4itmc35f',
+            'sec-fetch-dest': 'script',
+            'sec-fetch-mode': 'no-cors',
+            'sec-fetch-site': 'same-site',
+            'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Mobile Safari/537.36',
+
         }
         base_url = '''http://h5api.m.taobao.com/h5/mtop.taobao.detail.getdetail/6.0/?type=jsonp&dataType=jsonp&data=%7B%22id%22%3A%22{}%22%2C%22itemNumId%22%3A%22{}%22%2C%22itemId%22%3A%22{}%22%2C%22exParams%22%3A%22%7B%5C%22id%5C%22%3A%5C%22528234280515%5C%22%7D%22%2C%22detail_v%22%3A%228.0.0%22%2C%22utdid%22%3A%221%22%7D'''.format(
             itemid, itemid, itemid)
@@ -405,23 +408,55 @@ class ProcessProductInfoHandler(BaseHandler):
         # base_url = 'http://h5api.m.taobao.com/h5/mtop.taobao.detail.getdetail/6.0/?type=jsonp&dataType=jsonp&data=%7B%22id%22%3A%22604347120011%22%2C%22itemNumId%22%3A%22604347120011%22%2C%22itemId%22%3A%22604347120011%22%2C%22exParams%22%3A%22%7B%5C%22id%5C%22%3A%5C%22528234280515%5C%22%7D%22%2C%22detail_v%22%3A%228.0.0%22%2C%22utdid%22%3A%221%22%7D'
         # the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=0&city=0&yys=0&port=11&time=1&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
         # the_url = 'http://d.jghttp.golangapi.com/getip?num=1&type=2&pro=&city=0&yys=0&port=11&pack=28800&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
+        # print(base_url)
         try:
-            # while True:
-            status, res = await async_http_response(base_url, headers=headers)
+            while True:
+                status, res = await async_http_response(base_url, headers=headers)
                 # print(99,res[:40])
-                # try:
-                #     data_dict = json.loads(res)
-                #     if data_dict['api']:
-                #         pass
-                #     break
-                # except:
-                #     continue
+                try:
+                    data_dict = json.loads(res)
+                    if data_dict['api']:
+                        pass
+                    else:
+                        print('请求失败')
+                        # time.sleep(1800)
+                    break
+                except:
+                    print('请求异常')
+                    # time.sleep(1800)
+                    # continue
+                    break
             # print(88,res.text)
         except Exception as e:
             print(11111,e)
             return self.send_message(False, 400, 'fail', result)
-        # print(3333, the_data, type(the_data))
-        data_dict = json.loads(res)
+
+        '''
+        try:
+            # the_proxy_res = await requests.get(the_url)
+            # # print(the_proxy_res)
+            # the_proxy_data = await the_proxy_res.text()
+            # pro = json.loads(the_proxy_data)['data'][0]
+            proxies = {
+                'http': 'http://{}:{}'.format('42.203.23.90', '4568'),
+            }
+
+            res = req.get(base_url, headers=headers, proxies=proxies)
+            # res = await requests.get(base_url,headers=headers)
+            # the_data = await res.text()
+            # status, res = await async_http_response(base_url, proxies, headers=headers)
+            print(99, res)
+            the_data = res.text
+            print(88,the_data)
+        except Exception as e:
+            print(11111, e)
+            return self.send_message(False, 400, 'fail', result)
+        
+        data_dict = json.loads(res.text)
+        '''
+
+
+
         # print('the_data', data_dict)
         # status, response = await async_http_response(base_url,pro, headers=headers)
         # print(response)
@@ -431,10 +466,12 @@ class ProcessProductInfoHandler(BaseHandler):
         # if not status:
         #     return self.send_message(False, 400, 'fail', result)
         # data_dict = json.loads(the_data)
+        result['title']=data_dict['data']['item']['title']
         result['allItemCount']=data_dict['data']['seller']['allItemCount']
         result['vagueSellCount']=vagueSellCount
         result['creditLevel']=data_dict['data']['seller']['creditLevel']
         result['commentCount']=data_dict['data']['item']['commentCount']
+        result['images'] = data_dict['data']['item']['images']
         result['evaluates']=data_dict['data']['seller']['evaluates']
         result['props']=data_dict['data']['props']
         return self.send_message(True, 0, 'success', result)
