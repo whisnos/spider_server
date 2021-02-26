@@ -388,7 +388,7 @@ class ProcessProductInfoHandler(BaseHandler):
 
     async def post(self, *args, **kwargs):
         result = {}
-        print(11111111111, self.request.body)
+        log.info(11111111111, self.request.body)
         itemid = self.verify_arg_num(self.get_body_argument('itemid'), '商品id', is_num=True)
         headers = {
             'accept-encoding': 'gzip, deflate, br',
@@ -411,25 +411,25 @@ class ProcessProductInfoHandler(BaseHandler):
         # print(base_url)
         try:
             while True:
-                print(98,)
+                log.info(98,)
                 status, res = await async_http_response(base_url, headers=headers)
-                print(99,res[:40])
+                log.info(99,res[:40])
                 try:
                     data_dict = json.loads(res)
                     if data_dict['api']:
                         pass
                     else:
-                        print('请求失败')
+                        log.info('请求失败')
                         # time.sleep(1800)
                     break
                 except:
-                    print('请求异常')
+                    log.info('请求异常')
                     # time.sleep(1800)
                     # continue
                     break
             # print(88,res.text)
         except Exception as e:
-            print(11111,e)
+            log.info(11111,e)
             return self.send_message(False, 400, 'fail', result)
 
         '''
